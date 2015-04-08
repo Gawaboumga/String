@@ -1,15 +1,11 @@
 #include <catch.hpp>
 #include <String.hpp>
 
-#include <iostream>
-
 SCENARIO("String", "[CORE]")
 {
 
 	using Character = U8::Character;
 	using String = U8::String;
-
-	std::cout << String("Test") << std::endl;
 
 	GIVEN("Differents string.")
 	{
