@@ -31,7 +31,7 @@ namespace U8
 	Character::Character(const Character& character) :
 		m_string(nullptr)
 	{
-		assign(character);
+		assign(character.byte);
 	}
 
 	Character::~Character()
@@ -46,6 +46,9 @@ namespace U8
 
 	void Character::assign(const char* character)
 	{
+		if (utf8::distance(character, character + strlen(character)) > 1)
+			throw std::invalid_argument("Character class contains only one character.");
+
 		unsigned int i = 0;
 		while (character[i] && i < 4)
 		{

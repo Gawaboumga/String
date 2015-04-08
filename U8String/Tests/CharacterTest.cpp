@@ -37,6 +37,13 @@ SCENARIO("Character", "[CORE]")
 
 				}
 
+				{
+
+					Character tmp;
+					REQUIRE_THROWS(tmp = u8"ab");
+
+				}
+
 			}
 
 

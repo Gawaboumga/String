@@ -35,6 +35,24 @@ SCENARIO("String", "[CORE]")
 				}
 
 				{
+					String oneChar(Character(u8"à"));
+					REQUIRE(oneChar.capacity() >= 2);
+					REQUIRE(oneChar.size() == 1);
+				}
+
+				{
+					String oneChar(3, 'a');
+					REQUIRE(oneChar.capacity() >= 3);
+					REQUIRE(oneChar.size() == 3);
+				}
+
+				{
+					String oneChar(3, Character(u8"à"));
+					REQUIRE(oneChar.capacity() >= 6);
+					REQUIRE(oneChar.size() == 3);
+				}
+
+				{
 					String sizeTwoCapacityThree(u8"Téste", 1, 3);
 					REQUIRE(sizeTwoCapacityThree.capacity() >= 3);
 					REQUIRE(sizeTwoCapacityThree.size() == 2);
@@ -93,6 +111,12 @@ SCENARIO("String", "[CORE]")
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
 				}
 
+				{
+					String sizeThreeCapacityThree({u8"à", u8"b", u8"c"});
+					REQUIRE(sizeThreeCapacityThree.capacity() >= 4);
+					REQUIRE(sizeThreeCapacityThree.size() == 3);
+				}
+
 			}
 
 		}
@@ -135,9 +159,17 @@ SCENARIO("String", "[CORE]")
 				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 1);
 
+				emptyString = Character(u8"à");
+				REQUIRE(emptyString.capacity() >= 5);
+				REQUIRE(emptyString.size() == 1);
+
 				emptyString = {'c', 'a'};
 				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 2);
+
+				emptyString = {u8"ç", u8"à", u8"v"};
+				REQUIRE(emptyString.capacity() >= 5);
+				REQUIRE(emptyString.size() == 3);
 
 			}
 

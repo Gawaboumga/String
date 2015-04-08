@@ -140,10 +140,24 @@ namespace U8
 			assign(1, character);
 	}
 
+	String::String(const Character& character) :
+	m_sharedString(&emptyString)
+	{
+		if (character != '\0')
+			assign(1, character);
+	}
+
 	String::String(size_type rep, char character) :
 	m_sharedString(&emptyString)
 	{
-		if (rep > 0)
+		if (rep > 0 && character != '\0')
+			assign(rep, character);
+	}
+
+	String::String(size_type rep, const Character& character) :
+	m_sharedString(&emptyString)
+	{
+		if (rep > 0 && character != '\0')
 			assign(rep, character);
 	}
 
@@ -214,6 +228,13 @@ namespace U8
 			assign(init.begin(), init.end());
 	}
 
+	String::String(std::initializer_list<Character> init) :
+	m_sharedString(&emptyString)
+	{
+		if (init.size() != 0)
+			assign(init);
+	}
+
 	String::~String()
 	{
 		release_string();
@@ -237,13 +258,31 @@ namespace U8
 			release_string();
 	}
 
+	void String::assign(size_type n, const Character& character)
+	{
+		if (n > 0)
+		{
+			ensure_ownership();
+
+			if (n > capacity())
+				reserve(n * character.number_byte() + 1);
+
+			m_sharedString->size = n;
+
+			auto tmp = std::basic_string<char>(character);
+			for (auto i = 0U; i != n * character.number_byte(); ++i)
+				raw_buffer()[i] = tmp[i % character.number_byte()];
+			//std::fill(raw_buffer(), raw_buffer() + n * character.number_byte(), character);
+			m_sharedString->buffer[n * character.number_byte()] = 0; // String is terminated by a '\0'.
+		}
+		else
+			release_string();
+	}
+
 	void String::assign(const std::string& string)
 	{
 		if (!string.empty())
-		{
-			ensure_ownership();
 			assign(string.begin(), string.end());
-		}
 		else
 			release_string();
 	}
@@ -261,8 +300,6 @@ namespace U8
 	{
 		if (count > 0)
 		{
-			ensure_ownership();
-
 			if (count == npos)
 				assign(string.begin() + pos, string.end());
 			else
@@ -276,8 +313,6 @@ namespace U8
 	{
 		if (count > 0)
 		{
-			ensure_ownership();
-
 			if (count == npos)
 				assign(static_cast<pointer>(StringIterator(&string, pos)), static_cast<pointer>(StringIterator(&string, size())));
 			else
@@ -297,10 +332,7 @@ namespace U8
 	void String::assign(const char* string, size_type count)
 	{
 		if (count != 0)
-		{
-			ensure_ownership();
 			assign(string, string + count);
-		}
 		else
 			release_string();
 	}
@@ -310,10 +342,7 @@ namespace U8
 		size_type sizeString = std::strlen(string);
 
 		if (sizeString > 0)
-		{
-			ensure_ownership();
 			assign(string, string + sizeString);
-		}
 		else
 			release_string();
 	}
@@ -321,12 +350,31 @@ namespace U8
 	void String::assign(std::initializer_list<char> init)
 	{
 		if (init.size() != 0)
-		{
-			ensure_ownership();
 			assign(init.begin(), init.end());
-		}
 		else
 			release_string();
+	}
+
+	void String::assign(std::initializer_list<Character> init)
+	{
+		ensure_ownership();
+
+		auto sum = 0U;
+		for (auto character : init)
+			sum += character.number_byte();
+
+		if (sum > capacity())
+			reserve(sum + 1);
+
+		for (auto character : init)
+		{
+			auto tmp = std::basic_string<char>(character);
+			for (auto i = 0U; i != character.number_byte(); ++i)
+				raw_buffer()[i] = tmp[i % character.number_byte()];
+		}
+
+		m_sharedString->buffer[sum] = '\0'; // String is terminated by a '\0'.
+		m_sharedString->size = std::distance(init.begin(), init.end());
 	}
 
 	Character String::at(size_type pos)
@@ -474,7 +522,21 @@ namespace U8
 		return *this;
 	}
 
+	String& String::operator=(const Character& character)
+	{
+		assign(1, character);
+
+		return *this;
+	}
+
 	String& String::operator=(std::initializer_list<char> init)
+	{
+		assign(init);
+
+		return *this;
+	}
+
+	String& String::operator=(std::initializer_list<Character> init)
 	{
 		assign(init);
 

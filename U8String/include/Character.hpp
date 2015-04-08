@@ -48,8 +48,6 @@ namespace U8
 			Character& operator=(const char* character);
 			Character& operator=(const Character& character);
 
-			const char* raw() const;
-
 			operator std::basic_string<char> () const;
 
 		private:
