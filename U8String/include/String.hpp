@@ -82,7 +82,9 @@ namespace U8
 
 			String();
 			explicit String(char character);
+			explicit String(const Character& character);
 			String(size_type rep, char character);
+			String(size_type rep, const Character& character);
 			String(const std::string& string, size_type pos, size_type count);
 			String(const String& string, size_type pos, size_type count);
 			String(const char* string, size_type count);
@@ -92,10 +94,12 @@ namespace U8
 			explicit String(const std::string& string);
 			explicit String(const String& string);
 			String(String&& string);
+			String(std::initializer_list<Character> init);
 			String(std::initializer_list<char> init);
 			~String();
 
 			void assign(size_type n, char character);
+			void assign(size_type n, const Character& character);
 			void assign(const std::string& string);
 			void assign(const String& string);
 			void assign(const std::string& string, size_type pos, size_type count = npos);
@@ -106,6 +110,7 @@ namespace U8
 			template <class InputIterator>
 			void assign(is_input_iterator<InputIterator> first, InputIterator last);
 			void assign(std::initializer_list<char> init);
+			void assign(std::initializer_list<Character> init);
 
 			Character at(size_type pos);
 			const Character at(size_type pos) const;
@@ -132,7 +137,9 @@ namespace U8
 			String& operator=(String&& other);
 			String& operator=(const char* string);
 			String& operator=(char character);
+			String& operator=(const Character& character);
 			String& operator=(std::initializer_list<char> init);
+			String& operator=(std::initializer_list<Character> init);
 
 			Character operator[](size_type pos);
 			const Character operator[](size_type pos) const;

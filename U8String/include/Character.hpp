@@ -24,9 +24,9 @@ namespace U8
 		public:
 
 			Character();
-			explicit Character(char character);
+			Character(char character);
 			Character(const char* character);
-			explicit Character(const Character& character);
+			Character(const Character& character);
 			~Character();
 
 			void assign(char character);
@@ -47,6 +47,8 @@ namespace U8
 			Character& operator=(char character);
 			Character& operator=(const char* character);
 			Character& operator=(const Character& character);
+
+			const char* raw() const;
 
 			operator std::basic_string<char> () const;
 

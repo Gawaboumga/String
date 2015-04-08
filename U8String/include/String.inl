@@ -16,12 +16,14 @@ namespace U8
 	template <class InputIterator>
 	void String::assign(is_input_iterator<InputIterator> first, InputIterator last)
 	{
+		ensure_ownership();
+
 		size_type distance = static_cast<size_type>(std::distance(first, last));
 
 		if (distance > capacity())
 			reserve(distance + 1);
 
-		std::copy(first, last, m_sharedString->buffer);
+		std::copy(first, last, raw_buffer());
 
 		m_sharedString->buffer[distance] = '\0'; // String is terminated by a '\0'.
 		m_sharedString->size = utf8::distance(first, last);
