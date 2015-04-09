@@ -369,7 +369,73 @@ SCENARIO("String", "[CORE]")
 
 			}
 
+			THEN("We try to empty it")
+			{
+
+				abe = "";
+				abe.shrink_to_fit();
+				REQUIRE(abe == std::string(""));
+				REQUIRE(abe.capacity() == 0);
+				REQUIRE(abe.size() == 0);
+
+			}
+
 		}
+
+	}
+
+	GIVEN("One empty string")
+	{
+
+		String emptyString;
+
+		WHEN("We insert")
+		{
+
+			THEN("Insert with index ")
+			{
+
+				emptyString.insert(0, u8"léa");
+
+				REQUIRE(emptyString == u8"léa");
+				REQUIRE(emptyString.capacity() >= 4);
+				REQUIRE(emptyString.size() == 3);
+
+				emptyString.insert(1, u8"çà");
+
+				REQUIRE(emptyString == u8"lçàéa");
+				REQUIRE(emptyString.capacity() >= 8);
+				REQUIRE(emptyString.size() == 5);
+
+				emptyString.insert(emptyString.size(), 3, Character(u8"o"));
+
+				REQUIRE(emptyString == u8"lçàéaooo");
+				REQUIRE(emptyString.capacity() >= 11);
+				REQUIRE(emptyString.size() == 8);
+
+			}
+
+			THEN("Insert with iterator")
+			{
+
+				emptyString.insert(emptyString.begin(), { u8"ç", u8"a", u8"é" });
+
+				REQUIRE(emptyString == u8"çaé");
+				REQUIRE(emptyString.capacity() >= 5);
+				REQUIRE(emptyString.size() == 3);
+
+				auto it = emptyString.begin();
+				std::advance(it, 3);
+				emptyString.insert(it, 3, u8"!");
+
+				REQUIRE(emptyString == u8"çaé!!!");
+				REQUIRE(emptyString.capacity() >= 8);
+				REQUIRE(emptyString.size() == 6);
+
+			}
+
+		}
+
 
 	}
 

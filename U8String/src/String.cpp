@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <iostream>
 
 namespace U8
 {
@@ -410,6 +411,24 @@ namespace U8
 		return m_sharedString->capacity;
 	}
 
+	Character String::character_at(size_type pos) const
+	{
+		return { pos, this };
+	}
+
+	uint32_t String::code_point(size_type pos) const
+	{
+		utf8::iterator<const char*> it(data(), data(), data() + capacity());
+
+		while (pos > 0)
+		{
+			++it;
+			--pos;
+		}
+
+		return *it;
+	}
+
 	void String::clear(bool keepBuffer)
 	{
 		if (keepBuffer)
@@ -441,44 +460,75 @@ namespace U8
 		return { 0, this };
 	}
 
-	Character String::character_at(size_type pos) const
+	String& String::insert(size_type index, size_type count, const Character& character)
 	{
-		return { pos, this };
+		insert(StringIterator(this, index), count, character);
+
+		return *this;
 	}
 
-	uint32_t String::code_point(size_type pos) const
+	String& String::insert(size_type index, const char* string)
 	{
-		utf8::iterator<const char*> it(data(), data(), data() + capacity());
+		insert(StringIterator(this, index), string, string + std::strlen(string));
 
-		while (pos > 0)
-		{
-			++it;
-			--pos;
-		}
-
-		return *it;
+		return *this;
 	}
 
-	std::basic_string<char> String::raw_character(size_type pos) const
+	String::iterator String::insert(const_iterator pos, const Character& character)
 	{
-		utf8::iterator<const char*> it(data(), data(), data() + capacity());
+		return insert(pos, 1, character);
+	}
 
-		while (pos > 0)
+	String::iterator String::insert(const_iterator pos, size_type count, const Character& character)
+	{
+		auto offset = pos - data();
+		auto distance = count * character.number_byte();
+
+		if (empty())
+			reserve(capacity() + distance + 1);
+		else
+			reserve(capacity() + distance);
+
+		if (!empty())
+			right_shift(offset, distance, capacity() - 1);
+
+		auto tmp = std::basic_string<char>(character);
+		for (auto i = 0U; i != count * character.number_byte(); ++i)
+			raw_buffer()[offset + i] = tmp[i % character.number_byte()];
+
+		m_sharedString->buffer[capacity() - 1] = '\0'; // String is terminated by a '\0'.
+		m_sharedString->size += count;
+
+		return StringIterator(this, utf8::distance(raw_buffer(), raw_buffer() + offset));
+	}
+
+	String::iterator String::insert(const_iterator pos, std::initializer_list<Character> ilist)
+	{
+		auto offset = pos - data();
+		auto sum = 0U;
+		for (auto& ch : ilist)
+			sum += ch.number_byte();
+
+		if (empty())
+			reserve(capacity() + sum + 1);
+		else
+			reserve(capacity() + sum);
+
+		if (!empty())
+			right_shift(offset, sum, capacity() - 1);
+
+		auto position = 0;
+		for (auto& character : ilist)
 		{
-			++it;
-			--pos;
+			auto tmp = std::basic_string<char>(character);
+			for (auto i = 0U; i != character.number_byte(); ++i, ++position)
+				raw_buffer()[offset + position] = tmp[i];
 		}
 
-		auto tmp = it;
-		++it;
+		m_sharedString->buffer[capacity() - 1] = '\0'; // String is terminated by a '\0'.
+		m_sharedString->size += ilist.size();
 
-		std::basic_string<char> st;
-		for (const char* iter = tmp.base(); iter != it.base(); ++iter)
-		{
-			st.push_back(*iter);
-		}
-
-		return st;
+		return StringIterator(this, utf8::distance(raw_buffer(), raw_buffer() + offset));
 	}
 
 	String::size_type String::max_size() const
@@ -557,16 +607,26 @@ namespace U8
 
 	bool String::operator==(const std::string& other) const
 	{
-		return std::equal(data(), data() + std::strlen(data()), other.begin());
+		if (other.empty())
+			return empty() == true;
+
+		return std::equal(data(), data() + std::strlen(data()), other.begin()) && data()[std::strlen(data())] == '\0' && other.data()[other.size()] == '\0';
+		//return std::equal(data(), data() + std::strlen(data()), other.begin());
 	}
 
 	bool String::operator==(const String& other) const
 	{
+		if (other.empty())
+			return empty() == true;
+
 		return std::equal(begin(), end(), other.begin());
 	}
 
 	bool String::operator==(const char* other) const
 	{
+		if (other[0] == '\0')
+			return empty() == true;
+
 		return std::equal(data(), data() + std::strlen(data()), other);
 	}
 
@@ -585,6 +645,27 @@ namespace U8
 		return !operator==(other);
 	}
 
+	std::basic_string<char> String::raw_character(size_type pos) const
+	{
+		utf8::iterator<const char*> it(data(), data(), data() + capacity());
+
+		while (pos > 0)
+		{
+			++it;
+			--pos;
+		}
+
+		auto tmp = it;
+		++it;
+
+		std::basic_string<char> st;
+		for (const char* iter = tmp.base(); iter != it.base(); ++iter)
+		{
+			st.push_back(*iter);
+		}
+
+		return st;
+	}
 
 	void String::reserve(size_type bufferSize)
 	{
@@ -727,6 +808,15 @@ namespace U8
 		}
 
 		m_sharedString = &emptyString;
+	}
+
+	void String::right_shift(size_type pos, size_type length, size_type end)
+	{
+		char* beginBuffer = raw_buffer() + pos + length - 1;
+		char* endBuffer = raw_buffer() + end - 1;
+
+		for (char* i = endBuffer; i != beginBuffer; --i)
+			*i = *(i - length);
 	}
 
 	String::SharedString String::emptyString(0, 0, 0, nullptr);

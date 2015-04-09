@@ -130,6 +130,14 @@ namespace U8
 			Character front();
 			const Character front() const;
 
+			String& insert(size_type index, size_type count, const Character& character);
+			String& insert(size_type index, const char* string);
+			iterator insert(const_iterator pos, const Character& character);
+			iterator insert(const_iterator pos, size_type count, const Character& character);
+			template <class InputIterator>
+			iterator insert(const_iterator pos, is_input_iterator<InputIterator> first, InputIterator last);
+			iterator insert(const_iterator pos, std::initializer_list<Character> ilist);
+
 			size_type max_size() const;
 
 			String& operator=(const std::string& other);
@@ -190,8 +198,10 @@ namespace U8
 			};
 
 			void ensure_ownership();
+			char* get_index(size_type pos);
 			char* raw_buffer();
 			void release_string();
+			void right_shift(size_type pos, size_type length, size_type end);
 
 			SharedString* m_sharedString;
 
