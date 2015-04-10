@@ -460,9 +460,9 @@ namespace U8
 
 	String& String::erase(size_type index, size_type count)
 	{
-		 erase(StringIterator(this, index), StringIterator(this, std::min(count, size())));
+		erase(StringIterator(this, index), StringIterator(this, std::min(index + std::min(count, size()), size())));
 
-		 return *this;
+		return *this;
 	}
 
 	String::iterator String::erase(const_iterator position)
@@ -680,6 +680,16 @@ namespace U8
 	bool String::operator!=(const char* other) const
 	{
 		return !operator==(other);
+	}
+
+	void String::pop_back()
+	{
+		erase(size() - 1, 1);
+	}
+
+	void String::push_back(const Character& character)
+	{
+		insert(end(), character);
 	}
 
 	std::basic_string<char> String::raw_character(size_type pos) const

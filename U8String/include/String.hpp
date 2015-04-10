@@ -165,6 +165,9 @@ namespace U8
 			bool operator!=(const String& other) const;
 			bool operator!=(const char* other) const;
 
+			void pop_back();
+			void push_back(const Character& character);
+
 			std::basic_string<char> raw_character(size_type pos) const;
 			void reserve(size_type bufferSize = 0);
 			void replace(size_type pos, size_type count, const Character& character);

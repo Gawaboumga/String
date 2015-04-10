@@ -461,6 +461,11 @@ SCENARIO("String", "[CORE]")
 				REQUIRE(randomString == u8"h");
 				REQUIRE(randomString.size() == 1);
 
+				randomString = u8"hélto";
+				randomString.erase(1, 3);
+				REQUIRE(randomString == u8"ho");
+				REQUIRE(randomString.size() == 2);
+
 			}
 
 			THEN("This is expected with iterator")
@@ -485,6 +490,32 @@ SCENARIO("String", "[CORE]")
 
 		}
 
+	}
+
+	GIVEN("One string with some character")
+	{
+
+		String randomString(u8"Héllo");
+
+		WHEN("We push and pop")
+		{
+
+			THEN("This is expected")
+			{
+
+				randomString.push_back(u8"à");
+				REQUIRE(randomString == u8"Hélloà");
+				REQUIRE(randomString.capacity() >= 8);
+				REQUIRE(randomString.size() == 6);
+
+				randomString.pop_back();
+				REQUIRE(randomString == u8"Héllo");
+				REQUIRE(randomString.capacity() >= 8);
+				REQUIRE(randomString.size() == 5);
+
+			}
+
+		}
 
 	}
 
