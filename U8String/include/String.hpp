@@ -41,6 +41,8 @@ namespace U8
 
 					const int* base() const;
 
+					difference_type number_character(const StringIterator& rhs) const;
+
 					Character operator*();
 					const Character operator*() const;
 					operator char*() const;
@@ -126,6 +128,9 @@ namespace U8
 			const char* data() const;
 
 			bool empty() const;
+			String& erase(size_type index = 0, size_type count = npos);
+			iterator erase(const_iterator position);
+			iterator erase(const_iterator first, const_iterator last);
 
 			Character front();
 			const Character front() const;

@@ -23,6 +23,14 @@ namespace U8
 		return reinterpret_cast<const int*>(static_cast<const char*>(m_ptr.base()));
 	}
 
+	String::StringIterator::difference_type String::StringIterator::number_character(const StringIterator& rhs) const
+	{
+		if (m_string != rhs.m_string)
+			throw std::logic_error("Iterators are not associated with the same string !");
+
+		return rhs.m_pos - m_pos;
+	}
+
 	String::StringIterator String::StringIterator::operator++()
 	{
 		++m_ptr;
@@ -71,7 +79,7 @@ namespace U8
 
 	bool String::StringIterator::operator==(const StringIterator& rhs) const
 	{
-		return m_ptr == rhs.m_ptr;
+		return m_ptr.base() == rhs.m_ptr.base();
 	}
 
 	bool String::StringIterator::operator!=(const StringIterator& rhs) const
@@ -450,6 +458,35 @@ namespace U8
 		return m_sharedString->size == 0;
 	}
 
+	String& String::erase(size_type index, size_type count)
+	{
+		 erase(StringIterator(this, index), StringIterator(this, std::min(count, size())));
+
+		 return *this;
+	}
+
+	String::iterator String::erase(const_iterator position)
+	{
+		auto tmp = position;
+		return erase(position, ++tmp);
+	}
+
+	String::iterator String::erase(const_iterator first, const_iterator last)
+	{
+		auto lengthBeggining = begin().number_character(first);
+		auto length = first.number_character(last);
+
+		char* begin = first;
+		char* end = last;
+
+		std::rotate(begin, end, &raw_buffer()[capacity()]);
+
+		m_sharedString->buffer[capacity() - 1] = '\0';
+		m_sharedString->size -= length;
+
+		return StringIterator(this, lengthBeggining);
+	}
+
 	Character String::front()
 	{
 		return { 0, this };
@@ -485,7 +522,7 @@ namespace U8
 		auto distance = count * character.number_byte();
 
 		if (empty())
-			reserve(capacity() + distance + 1);
+			reserve(capacity() + distance + 1); // String is terminated by a '\0'.
 		else
 			reserve(capacity() + distance);
 
@@ -510,7 +547,7 @@ namespace U8
 			sum += ch.number_byte();
 
 		if (empty())
-			reserve(capacity() + sum + 1);
+			reserve(capacity() + sum + 1); // String is terminated by a '\0'.
 		else
 			reserve(capacity() + sum);
 

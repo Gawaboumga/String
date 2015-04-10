@@ -418,19 +418,68 @@ SCENARIO("String", "[CORE]")
 			THEN("Insert with iterator")
 			{
 
-				emptyString.insert(emptyString.begin(), { u8"ç", u8"a", u8"é" });
+				auto it = emptyString.insert(emptyString.begin(), { u8"ç", u8"a", u8"é" });
 
+				REQUIRE(it == emptyString.begin());
 				REQUIRE(emptyString == u8"çaé");
 				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 3);
 
-				auto it = emptyString.begin();
+				it = emptyString.begin();
 				std::advance(it, 3);
-				emptyString.insert(it, 3, u8"!");
+				auto tmp = emptyString.insert(it, 3, u8"!");
 
+				it = emptyString.begin();
+				std::advance(it, 3);
+				REQUIRE(it == tmp);
 				REQUIRE(emptyString == u8"çaé!!!");
 				REQUIRE(emptyString.capacity() >= 8);
 				REQUIRE(emptyString.size() == 6);
+
+			}
+
+		}
+
+	}
+
+	GIVEN("One string with characters")
+	{
+
+		String randomString(u8"hélto");
+
+		WHEN("We erase")
+		{
+
+			THEN("This is expected with index")
+			{
+
+				randomString.erase(4).erase(3);
+				REQUIRE(randomString == u8"hél");
+				REQUIRE(randomString.size() == 3);
+
+				randomString.erase(1);
+				REQUIRE(randomString == u8"h");
+				REQUIRE(randomString.size() == 1);
+
+			}
+
+			THEN("This is expected with iterator")
+			{
+
+				auto it = randomString.erase(--randomString.end());
+				REQUIRE(randomString == u8"hélt");
+				REQUIRE(randomString.size() == 4);
+				REQUIRE(it == randomString.end());
+
+				auto itBegin = randomString.begin();
+				std::advance(itBegin, 1);
+				auto itEnd = randomString.begin();
+				std::advance(itEnd, 3);
+
+				it = randomString.erase(itBegin, itEnd);
+				REQUIRE(it == --randomString.end());
+				REQUIRE(randomString == u8"ht");
+				REQUIRE(randomString.size() == 2);
 
 			}
 
