@@ -249,6 +249,21 @@ namespace U8
 		release_string();
 	}
 
+	String& String::append(const Character& character)
+	{
+		return insert(size(), 1, character);
+	}
+
+	String& String::append(const char* string)
+	{
+		return insert(size(), string);
+	}
+
+	String& String::append(const String& string)
+	{
+		return insert(size(), string.data());
+	}
+
 	void String::assign(size_type n, char character)
 	{
 		if (n > 0)
@@ -485,6 +500,49 @@ namespace U8
 		m_sharedString->size -= length;
 
 		return StringIterator(this, lengthBeggining);
+	}
+
+	String::size_type String::find(const String& str, size_type pos) const
+	{
+		return find(str.data(), pos);
+	}
+
+	String::size_type String::find(const char* string, size_type pos) const
+	{
+		auto stringSize = strlen(string);
+		if (stringSize == 0)
+			return empty() == true;
+
+		auto it = begin();
+		std::advance(it, pos);
+
+		auto offset = it - begin();
+
+		for (auto i = offset; data()[i]; ++i)
+		{
+			if (data()[i] == string[0])
+			{
+				auto beginning = i;
+
+				++i;
+				bool canContinue = true;
+				for (auto j = 1U; j < stringSize && canContinue; ++i, ++j)
+					if (data()[i] != string[j])
+						canContinue = false;
+
+				if (canContinue)
+					return utf8::distance(data(), data() + beginning);
+
+				--i;
+			}
+		}
+
+		return npos;
+	}
+
+	String::size_type String::find(const Character& character, size_type pos) const
+	{
+		return find(static_cast<std::basic_string<char>>(character).data(), pos);
 	}
 
 	Character String::front()

@@ -100,6 +100,10 @@ namespace U8
 			String(std::initializer_list<char> init);
 			~String();
 
+			String& append(const Character& character);
+			String& append(const char* string);
+			String& append(const String& string);
+
 			void assign(size_type n, char character);
 			void assign(size_type n, const Character& character);
 			void assign(const std::string& string);
@@ -132,6 +136,9 @@ namespace U8
 			iterator erase(const_iterator position);
 			iterator erase(const_iterator first, const_iterator last);
 
+			size_type find(const String& str, size_type pos = 0) const;
+			size_type find(const char* string, size_type start = 0) const;
+			size_type find(const Character& character, size_type pos = 0) const;
 			Character front();
 			const Character front() const;
 

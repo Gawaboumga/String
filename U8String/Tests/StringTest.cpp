@@ -497,7 +497,7 @@ SCENARIO("String", "[CORE]")
 
 		String randomString(u8"Héllo");
 
-		WHEN("We push and pop")
+		WHEN("We push, pop and append")
 		{
 
 			THEN("This is expected")
@@ -513,9 +513,50 @@ SCENARIO("String", "[CORE]")
 				REQUIRE(randomString.capacity() >= 8);
 				REQUIRE(randomString.size() == 5);
 
+				randomString.append(u8"à");
+				REQUIRE(randomString == u8"Hélloà");
+				REQUIRE(randomString.capacity() >= 8);
+				REQUIRE(randomString.size() == 6);
+
+				randomString.append(u8"blabla");
+				REQUIRE(randomString == u8"Hélloàblabla");
+				REQUIRE(randomString.capacity() >= 14);
+				REQUIRE(randomString.size() == 12);
+
+				randomString.append(String(u8"Test"));
+				REQUIRE(randomString == u8"HélloàblablaTest");
+				REQUIRE(randomString.capacity() >= 18);
+				REQUIRE(randomString.size() == 16);
+
 			}
 
 		}
+
+	}
+
+	GIVEN("One random string")
+	{
+
+		String randomString(u8" éà à etc ...");
+
+		WHEN("We try to find something")
+		{
+
+			THEN("These results are expected")
+			{
+
+				auto pos = randomString.find(u8"à");
+				REQUIRE(pos == 2);
+				pos = randomString.find(u8"à", pos + 1);
+				REQUIRE(pos == 4);
+
+				pos = randomString.find(String(u8"etc"));
+				REQUIRE(pos == 6);
+
+			}
+
+		}
+
 
 	}
 
