@@ -557,6 +557,25 @@ SCENARIO("String", "[CORE]")
 
 		}
 
+	}
+
+	GIVEN("One random string")
+	{
+
+		String randomString(u8"hello ");
+
+		WHEN("We try to do operator+=")
+		{
+
+			THEN("These results are expected")
+			{
+
+				randomString += randomString;
+				REQUIRE(randomString == u8"hello hello ");
+
+			}
+
+		}
 
 	}
 

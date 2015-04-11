@@ -700,9 +700,9 @@ namespace U8
 		return { pos, this };
 	}
 
-	String& String::operator+=(const std::string& other)
+	String& String::operator+=(const char* other)
 	{
-		append(other.c_str());
+		append(other);
 		return *this;
 	}
 
