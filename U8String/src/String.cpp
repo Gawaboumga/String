@@ -700,6 +700,24 @@ namespace U8
 		return { pos, this };
 	}
 
+	String& String::operator+=(const std::string& other)
+	{
+		append(other.c_str());
+		return *this;
+	}
+
+	String& String::operator+=(const String& other)
+	{
+		append(other);
+		return *this;
+	}
+
+	String& String::operator+=(const Character& other)
+	{
+		append(other);
+		return *this;
+	}
+
 	bool String::operator==(const std::string& other) const
 	{
 		if (other.empty())

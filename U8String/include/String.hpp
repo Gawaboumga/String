@@ -164,6 +164,10 @@ namespace U8
 			Character operator[](size_type pos);
 			const Character operator[](size_type pos) const;
 
+			String& operator+=(const std::string& other);
+			String& operator+=(const String& other);
+			String& operator+=(const Character& other);
+
 			bool operator==(const std::string& other) const;
 			bool operator==(const String& other) const;
 			bool operator==(const char* other) const;
