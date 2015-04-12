@@ -557,6 +557,19 @@ SCENARIO("String", "[CORE]")
 
 		}
 
+		WHEN("We use std::find")
+		{
+
+			THEN("This should work")
+			{
+
+				auto it = std::find(randomString.begin(), randomString.end(), u8"à");
+				REQUIRE(it == ++(++randomString.begin()));
+
+			}
+
+		}
+
 	}
 
 	GIVEN("One random string")
@@ -573,9 +586,58 @@ SCENARIO("String", "[CORE]")
 				randomString += randomString;
 				REQUIRE(randomString == u8"hello hello ");
 
+				String helloWorld = String("hello") + String(" ") + String("world");
+				REQUIRE(helloWorld == "hello world");
+
 			}
 
 		}
+
+	}
+
+	GIVEN("Two string")
+	{
+
+		WHEN("We test operator of comparison")
+		{
+
+			THEN("These are expected")
+			{
+
+				{
+
+					String American(u8"hrnec");
+					String Czech(u8"chrt");
+
+					REQUIRE(American.compare(Czech, std::locale("en_US.utf8")) > 0);
+					REQUIRE(American.compare(Czech, std::locale("cs_CZ.utf8")) < 0); // sudo locale-gen cs_CZ.utf8 or comment it :)
+
+				}
+
+				{
+
+					String American(u8"ängel");
+					String Swedish(u8"år");
+
+					REQUIRE(American.compare(Swedish, std::locale("en_US.utf8")) < 0);
+					REQUIRE(American.compare(Swedish, std::locale("sv_SE.utf8")) > 0); // sudo locale-gen sv_SE.utf8 or comment it :)
+
+				}
+
+				{
+
+					String A(u8"à");
+					String E(u8"é");
+					REQUIRE(A < E);
+
+				}
+
+
+			}
+
+
+		}
+
 
 	}
 

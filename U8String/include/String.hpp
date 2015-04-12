@@ -4,6 +4,7 @@
 #include <Character.hpp>
 
 #include <atomic>
+#include <locale>
 
 #include <utf8.h>
 
@@ -128,6 +129,8 @@ namespace U8
 			Character character_at(size_type pos) const;
 			void clear(bool keepBuffer = true);
 			uint32_t code_point(size_type pos) const;
+			int compare(const std::string& other, const std::locale& locale = std::locale()) const;
+			int compare(const String& other, const std::locale& locale = std::locale()) const;
 
 			const char* data() const;
 
@@ -164,17 +167,11 @@ namespace U8
 			Character operator[](size_type pos);
 			const Character operator[](size_type pos) const;
 
+			friend String operator+(const String& lhs, const String& rhs);
+
 			String& operator+=(const char* string);
 			String& operator+=(const String& other);
 			String& operator+=(const Character& other);
-
-			bool operator==(const std::string& other) const;
-			bool operator==(const String& other) const;
-			bool operator==(const char* other) const;
-
-			bool operator!=(const std::string& other) const;
-			bool operator!=(const String& other) const;
-			bool operator!=(const char* other) const;
 
 			void pop_back();
 			void push_back(const Character& character);
@@ -227,6 +224,25 @@ namespace U8
 			static SharedString emptyString;
 	};
 
+	bool operator==(const String& lhs, const String& rhs);
+	bool operator==(const String& lhs, const std::string& rhs);
+
+	bool operator!=(const String& lhs, const String& rhs);
+	bool operator!=(const String& lhs, const std::string& rhs);
+
+	bool operator<(const String& lhs, const String& rhs);
+	bool operator<(const String& lhs, const std::string& rhs);
+
+	bool operator<=(const String& lhs, const String& rhs);
+	bool operator<=(const String& lhs, const std::string& rhs);
+
+	bool operator>(const String& lhs, const String& rhs);
+	bool operator>(const String& lhs, const std::string& rhs);
+
+	bool operator>=(const String& lhs, const String& rhs);
+	bool operator>=(const String& lhs, const std::string& rhs);
+
+	std::istream& operator>>(std::istream& is, const String& str);
 	std::ostream& operator<<(std::ostream& os, const String& str);
 
 } // U8

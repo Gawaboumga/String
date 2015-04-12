@@ -452,6 +452,22 @@ namespace U8
 		return *it;
 	}
 
+	int String::compare(const std::string& other, const std::locale& locale) const
+	{
+		auto& f = std::use_facet<std::collate<char>>(locale);
+		std::basic_string<char> s1(data()), s2(other);
+		return f.compare(s1.data(), s1.data() + s1.size(),
+			other.data(), other.data() + other.size());
+	}
+
+	int String::compare(const String& other, const std::locale& locale) const
+	{
+		auto& f = std::use_facet<std::collate<char>>(locale);
+		std::basic_string<char> s1(data()), s2(other.data());
+		return f.compare(s1.data(), s1.data() + s1.size(),
+			s2.data(), s2.data() + s2.size());
+	}
+
 	void String::clear(bool keepBuffer)
 	{
 		if (keepBuffer)
@@ -542,7 +558,10 @@ namespace U8
 
 	String::size_type String::find(const Character& character, size_type pos) const
 	{
-		return find(static_cast<std::basic_string<char>>(character).data(), pos);
+		auto itBegin = begin();
+		std::advance(itBegin, pos);
+		auto it = std::find(itBegin, end(), character);
+		return itBegin.number_character(it);
 	}
 
 	Character String::front()
@@ -716,46 +735,6 @@ namespace U8
 	{
 		append(other);
 		return *this;
-	}
-
-	bool String::operator==(const std::string& other) const
-	{
-		if (other.empty())
-			return empty() == true;
-
-		return std::equal(data(), data() + std::strlen(data()), other.begin()) && data()[std::strlen(data())] == '\0' && other.data()[other.size()] == '\0';
-		//return std::equal(data(), data() + std::strlen(data()), other.begin());
-	}
-
-	bool String::operator==(const String& other) const
-	{
-		if (other.empty())
-			return empty() == true;
-
-		return std::equal(begin(), end(), other.begin());
-	}
-
-	bool String::operator==(const char* other) const
-	{
-		if (other[0] == '\0')
-			return empty() == true;
-
-		return std::equal(data(), data() + std::strlen(data()), other);
-	}
-
-	bool String::operator!=(const std::string& other) const
-	{
-		return !operator==(other);
-	}
-
-	bool String::operator!=(const String& other) const
-	{
-		return !operator==(other);
-	}
-
-	bool String::operator!=(const char* other) const
-	{
-		return !operator==(other);
 	}
 
 	void String::pop_back()
@@ -944,6 +923,84 @@ namespace U8
 
 	String::SharedString String::emptyString(0, 0, 0, nullptr);
 	String::size_type const String::npos(std::numeric_limits<String::size_type>::max());
+
+	String operator+(const String& lhs, const String& rhs)
+	{
+		auto firstSize = std::strlen(lhs.data());
+		auto secondSize = std::strlen(rhs.data());
+		String::pointer newBuffer = new String::value_type[firstSize + secondSize + 1];
+		std::copy(lhs.data(), lhs.data() + firstSize, newBuffer);
+		std::copy(rhs.data(), rhs.data() + secondSize, newBuffer + firstSize);
+		newBuffer[firstSize + secondSize] = '\0';
+
+		String tmp;
+		tmp.m_sharedString = new String::SharedString(1, firstSize + secondSize + 1, lhs.size() + rhs.size(), newBuffer);
+		return tmp;
+	}
+
+	bool operator==(const String& lhs, const String& rhs)
+	{
+		return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+	}
+
+	bool operator==(const String& lhs, const std::string& rhs)
+	{
+		if (rhs.empty())
+			return lhs.empty() == true;
+
+		return std::equal(lhs.data(), lhs.data() + std::strlen(lhs.data()), rhs.begin());
+	}
+
+	bool operator!=(const String& lhs, const String& rhs)
+	{
+		return !operator==(lhs, rhs);
+	}
+
+	bool operator!=(const String& lhs, const std::string& rhs)
+	{
+		return !operator==(lhs, rhs);
+	}
+
+	bool operator<(const String& lhs, const String& rhs)
+	{
+		return lhs.compare(rhs) == -1;
+	}
+
+	bool operator<(const String& lhs, const std::string& rhs)
+	{
+		return lhs.compare(rhs) == -1;
+	}
+
+	bool operator<=(const String& lhs, const String& rhs)
+	{
+		auto tmp = lhs.compare(rhs);
+		return tmp == -1 && tmp == 0;
+	}
+
+	bool operator<=(const String& lhs, const std::string& rhs)
+	{
+		auto tmp = lhs.compare(rhs);
+		return tmp == -1 && tmp == 0;
+	}
+
+	bool operator>(const String& lhs, const String& rhs)
+	{
+		return !operator<=(lhs, rhs);
+	}
+	bool operator>(const String& lhs, const std::string& rhs)
+	{
+		return !operator<=(lhs, rhs);
+	}
+
+	bool operator>=(const String& lhs, const String& rhs)
+	{
+		return !operator<(lhs, rhs);
+	}
+
+	bool operator>=(const String& lhs, const std::string& rhs)
+	{
+		return !operator<(lhs, rhs);
+	}
 
 	std::ostream& operator<<(std::ostream& os, const String& str)
 	{
