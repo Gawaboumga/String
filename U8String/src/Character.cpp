@@ -11,25 +11,25 @@ namespace U8
 {
 
 	Character::Character() :
-		m_string(nullptr)
+		m_position(0), m_string(nullptr)
 	{
 		byte[0] = '\0';
 	}
 
 	Character::Character(char character) :
-		m_string(nullptr)
+		m_position(0), m_string(nullptr)
 	{
 		assign(character);
 	}
 
 	Character::Character(const char* character) :
-		m_string(nullptr)
+		m_position(0), m_string(nullptr)
 	{
 		assign(character);
 	}
 
 	Character::Character(const Character& character) :
-		m_string(nullptr)
+		m_position(0), m_string(nullptr)
 	{
 		assign(character.byte);
 	}
@@ -64,7 +64,7 @@ namespace U8
 
 	void Character::assign(const Character& character)
 	{
-		unsigned int i = 0;
+		size_type i = 0;
 		while (i < character.number_byte())
 		{
 			byte[i] = character[i];
@@ -155,7 +155,8 @@ namespace U8
 		return std::basic_string<char>(byteArray);
 	}
 
-	Character::Character(uint32_t position, const String* string)
+	Character::Character(size_type position, const String* string) :
+		m_position(position), m_string(const_cast<String*>(string))
 	{
 		std::basic_string<char> tmp = string->raw_character(position);
 		unsigned int i = 0;
@@ -169,10 +170,6 @@ namespace U8
 		{
 			byte[i] = '\0';
 		}
-
-
-		m_position = position;
-		m_string = const_cast<String*>(string);
 	}
 
 	char Character::operator[](unsigned char pos) const

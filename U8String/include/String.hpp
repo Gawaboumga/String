@@ -14,7 +14,7 @@ namespace U8
 	class String
 	{
 		template <class InputIterator>
-		using is_input_iterator = typename std::enable_if<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIterator>::iterator_category>::value, InputIterator>::type;
+		using is_random_access_iterator = typename std::enable_if<std::is_base_of<std::random_access_iterator_tag, typename std::iterator_traits<InputIterator>::iterator_category>::value, InputIterator>::type;
 
 		public:
 
@@ -23,8 +23,8 @@ namespace U8
 			typedef const value_type& const_reference;
 			typedef value_type* pointer;
 			typedef const value_type* const_pointer;
-			typedef unsigned int size_type;
-			typedef int difference_type;
+			typedef std::size_t size_type;
+			typedef std::ptrdiff_t difference_type;
 
 			class StringIterator
 			{
@@ -37,6 +37,7 @@ namespace U8
 					typedef String::difference_type difference_type;
 					typedef std::bidirectional_iterator_tag iterator_category;
 
+					StringIterator(const StringIterator& other) = default;
 					StringIterator(const String* string, size_type pos);
 					~StringIterator();
 
@@ -47,13 +48,14 @@ namespace U8
 					Character operator*();
 					const Character operator*() const;
 					operator char*() const;
+					StringIterator& operator=(const StringIterator& other) = default;
 
 					bool operator==(const StringIterator& rhs) const;
 					bool operator!=(const StringIterator& rhs) const;
 
-					StringIterator operator++();
+					StringIterator& operator++();
 					StringIterator operator++(int);
-					StringIterator operator--();
+					StringIterator& operator--();
 					StringIterator operator--(int);
 
 				private:
@@ -93,7 +95,7 @@ namespace U8
 			String(const char* string, size_type count);
 			explicit String(const char* string);
 			template <class InputIterator>
-			String(is_input_iterator<InputIterator> first, InputIterator last);
+			String(is_random_access_iterator<InputIterator> first, InputIterator last);
 			explicit String(const std::string& string);
 			explicit String(const String& string);
 			String(String&& string);
@@ -115,7 +117,7 @@ namespace U8
 			void assign(const char* string, size_type count);
 			void assign(const char* string);
 			template <class InputIterator>
-			void assign(is_input_iterator<InputIterator> first, InputIterator last);
+			void assign(is_random_access_iterator<InputIterator> first, InputIterator last);
 			void assign(std::initializer_list<char> init);
 			void assign(std::initializer_list<Character> init);
 
@@ -150,7 +152,7 @@ namespace U8
 			iterator insert(const_iterator pos, const Character& character);
 			iterator insert(const_iterator pos, size_type count, const Character& character);
 			template <class InputIterator>
-			iterator insert(const_iterator pos, is_input_iterator<InputIterator> first, InputIterator last);
+			iterator insert(const_iterator pos, is_random_access_iterator<InputIterator> first, InputIterator last);
 			iterator insert(const_iterator pos, std::initializer_list<Character> ilist);
 
 			size_type max_size() const;
@@ -242,7 +244,7 @@ namespace U8
 	bool operator>=(const String& lhs, const String& rhs);
 	bool operator>=(const String& lhs, const std::string& rhs);
 
-	std::istream& operator>>(std::istream& is, const String& str);
+	std::istream& operator>>(std::istream& is, String& str);
 	std::ostream& operator<<(std::ostream& os, const String& str);
 
 } // U8

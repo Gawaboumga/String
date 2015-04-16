@@ -3,19 +3,16 @@
 
 namespace U8
 {
-
 	template <class InputIterator>
-	String::String(is_input_iterator<InputIterator> first, InputIterator last) :
+	String::String(is_random_access_iterator<InputIterator> first, InputIterator last) :
 	m_sharedString(&emptyString)
 	{
-		size_type distance = static_cast<size_type>(std::distance(first, last));
-
-		if (distance > 0)
+		if (first != last)
 			assign(first, last);
 	}
 
 	template <class InputIterator>
-	void String::assign(is_input_iterator<InputIterator> first, InputIterator last)
+	void String::assign(is_random_access_iterator<InputIterator> first, InputIterator last)
 	{
 		ensure_ownership();
 
@@ -31,7 +28,7 @@ namespace U8
 	}
 
 	template <class InputIterator>
-	String::iterator String::insert(const_iterator pos, is_input_iterator<InputIterator> first, InputIterator last)
+	String::iterator String::insert(const_iterator pos, is_random_access_iterator<InputIterator> first, InputIterator last)
 	{
 		ensure_ownership();
 

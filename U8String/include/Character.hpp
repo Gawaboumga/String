@@ -18,8 +18,8 @@ namespace U8
 		typedef const value_type& const_reference;
 		typedef value_type* pointer;
 		typedef const value_type* const_pointer;
-		typedef unsigned int size_type;
-		typedef int difference_type;
+		typedef std::size_t size_type;
+		typedef std::ptrdiff_t difference_type;
 
 		public:
 
@@ -52,7 +52,7 @@ namespace U8
 
 		private:
 
-			Character(uint32_t position, const String* string);
+			Character(size_type position, const String* string);
 
 			char operator[](unsigned char pos) const;
 

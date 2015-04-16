@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <sstream>
 #include <iostream>
 
 namespace U8
@@ -31,7 +32,7 @@ namespace U8
 		return rhs.m_pos - m_pos;
 	}
 
-	String::StringIterator String::StringIterator::operator++()
+	String::StringIterator& String::StringIterator::operator++()
 	{
 		++m_ptr;
 		++m_pos;
@@ -46,7 +47,7 @@ namespace U8
 		return tmp;
 	}
 
-	String::StringIterator String::StringIterator::operator--()
+	String::StringIterator& String::StringIterator::operator--()
 	{
 		if (m_pos > 0)
 			--m_ptr;
@@ -266,7 +267,7 @@ namespace U8
 
 	void String::assign(size_type n, char character)
 	{
-		if (n > 0)
+		if (n > 0U)
 		{
 			ensure_ownership();
 
@@ -383,8 +384,8 @@ namespace U8
 	{
 		ensure_ownership();
 
-		auto sum = 0U;
-		for (auto character : init)
+		size_type sum = 0U;
+		for (const auto& character : init)
 			sum += character.number_byte();
 
 		if (sum > capacity())
@@ -507,10 +508,10 @@ namespace U8
 		auto lengthBeggining = begin().number_character(first);
 		auto length = first.number_character(last);
 
-		char* begin = first;
-		char* end = last;
+		char* beginPosition = first;
+		char* endPosition = last;
 
-		std::rotate(begin, end, &raw_buffer()[capacity()]);
+		std::rotate(beginPosition, endPosition, &raw_buffer()[capacity()]);
 
 		m_sharedString->buffer[capacity() - 1] = '\0';
 		m_sharedString->size -= length;
@@ -619,8 +620,8 @@ namespace U8
 	String::iterator String::insert(const_iterator pos, std::initializer_list<Character> ilist)
 	{
 		auto offset = pos - data();
-		auto sum = 0U;
-		for (auto& ch : ilist)
+		size_type sum = 0U;
+		for (const auto& ch : ilist)
 			sum += ch.number_byte();
 
 		if (empty())
@@ -799,10 +800,10 @@ namespace U8
 		auto tmp = it;
 		++it;
 
-		auto diff = it - tmp;
+		size_type diff = it - tmp;
 		if (diff == count * character.number_byte())
 		{
-			for (auto i = 0; i < diff; ++i)
+			for (auto i = 0U; i < diff; ++i)
 				tmp[i] = character.byte[i % character.number_byte()];
 
 			m_sharedString->size += count - 1;
@@ -912,10 +913,10 @@ namespace U8
 		m_sharedString = &emptyString;
 	}
 
-	void String::right_shift(size_type pos, size_type length, size_type end)
+	void String::right_shift(size_type pos, size_type length, size_type endBuf)
 	{
 		char* beginBuffer = raw_buffer() + pos + length - 1;
-		char* endBuffer = raw_buffer() + end - 1;
+		char* endBuffer = raw_buffer() + endBuf - 1;
 
 		for (char* i = endBuffer; i != beginBuffer; --i)
 			*i = *(i - length);
@@ -974,13 +975,13 @@ namespace U8
 	bool operator<=(const String& lhs, const String& rhs)
 	{
 		auto tmp = lhs.compare(rhs);
-		return tmp == -1 && tmp == 0;
+		return tmp == -1 || tmp == 0;
 	}
 
 	bool operator<=(const String& lhs, const std::string& rhs)
 	{
 		auto tmp = lhs.compare(rhs);
-		return tmp == -1 && tmp == 0;
+		return tmp == -1 || tmp == 0;
 	}
 
 	bool operator>(const String& lhs, const String& rhs)
@@ -1000,6 +1001,19 @@ namespace U8
 	bool operator>=(const String& lhs, const std::string& rhs)
 	{
 		return !operator<(lhs, rhs);
+	}
+
+	std::istream& operator>>(std::istream& is, String& str)
+	{
+		str.clear();
+
+		std::string tmp;
+		is >> tmp;
+
+		str.assign(tmp);
+
+		return is;
+
 	}
 
 	std::ostream& operator<<(std::ostream& os, const String& str)
