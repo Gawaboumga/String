@@ -175,24 +175,14 @@ namespace U8
 	m_sharedString(&emptyString)
 	{
 		if (count > 0)
-		{
-			if (count == npos)
-				assign(string.begin() + pos, string.end());
-			else
-				assign(string.begin() + pos, string.begin() + pos + count);
-		}
+			assign(string, pos, count);
 	}
 
 	String::String(const String& string, size_type pos, size_type count) :
 	m_sharedString(&emptyString)
 	{
 		if (count > 0)
-		{
-			if (count == npos)
-				assign(static_cast<pointer>(StringIterator(&string, pos)), static_cast<pointer>(StringIterator(&string, string.size())));
-			else
-				assign(static_cast<pointer>(StringIterator(&string, pos)), static_cast<pointer>(StringIterator(&string, pos + count)));
-		}
+			assign(string, pos, count);
 	}
 
 	String::String(const char* string, size_type count) :
@@ -205,10 +195,8 @@ namespace U8
 	String::String(const char* string) :
 	m_sharedString(&emptyString)
 	{
-		size_type sizeString = std::strlen(string);
-
-		if (sizeString != 0)
-			assign(string, string + sizeString);
+		if (string)
+			assign(string);
 	}
 
 	String::String(const std::string& string) :
@@ -339,7 +327,7 @@ namespace U8
 		if (count > 0)
 		{
 			if (count == npos)
-				assign(static_cast<pointer>(StringIterator(&string, pos)), static_cast<pointer>(StringIterator(&string, size())));
+				assign(static_cast<pointer>(StringIterator(&string, pos)), static_cast<pointer>(StringIterator(&string, string.size())));
 			else
 				assign(static_cast<pointer>(StringIterator(&string, pos)), static_cast<pointer>(StringIterator(&string, pos + count)));
 		}
@@ -871,6 +859,14 @@ namespace U8
 	String::size_type String::size() const
 	{
 		return m_sharedString->size;
+	}
+
+	String String::substr(size_type pos, size_type count) const
+	{
+		if (pos > size())
+			throw std::out_of_range("Index out of range " + std::to_string(pos) + " >= " + std::to_string(size()) + ')');
+
+		return String(*this, pos, count);
 	}
 
 	void String::swap(String& other)

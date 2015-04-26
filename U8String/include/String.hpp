@@ -13,8 +13,8 @@ namespace U8
 
 	class String
 	{
-		template <class InputIterator>
-		using is_random_access_iterator = typename std::enable_if<std::is_base_of<std::random_access_iterator_tag, typename std::iterator_traits<InputIterator>::iterator_category>::value, InputIterator>::type;
+		template <class RandomIter>
+		using RequireRandomIter = typename std::enable_if<std::is_convertible<typename std::iterator_traits<RandomIter>::iterator_category, std::random_access_iterator_tag>::value>::type;
 
 		public:
 
@@ -94,8 +94,8 @@ namespace U8
 			String(const String& string, size_type pos, size_type count);
 			String(const char* string, size_type count);
 			explicit String(const char* string);
-			template <class InputIterator>
-			String(is_random_access_iterator<InputIterator> first, InputIterator last);
+			template <typename RandomIter, typename = RequireRandomIter<RandomIter>>
+			String(RandomIter first, RandomIter last);
 			explicit String(const std::string& string);
 			explicit String(const String& string);
 			String(String&& string);
@@ -116,8 +116,8 @@ namespace U8
 			void assign(String&& string);
 			void assign(const char* string, size_type count);
 			void assign(const char* string);
-			template <class InputIterator>
-			void assign(is_random_access_iterator<InputIterator> first, InputIterator last);
+			template <typename RandomIter, typename = RequireRandomIter<RandomIter>>
+			void assign(RandomIter first, RandomIter last);
 			void assign(std::initializer_list<char> init);
 			void assign(std::initializer_list<Character> init);
 
@@ -151,8 +151,8 @@ namespace U8
 			String& insert(size_type index, const char* string);
 			iterator insert(const_iterator pos, const Character& character);
 			iterator insert(const_iterator pos, size_type count, const Character& character);
-			template <class InputIterator>
-			iterator insert(const_iterator pos, is_random_access_iterator<InputIterator> first, InputIterator last);
+			template <typename RandomIter, typename = RequireRandomIter<RandomIter>>
+			iterator insert(const_iterator pos, RandomIter first, RandomIter last);
 			iterator insert(const_iterator pos, std::initializer_list<Character> ilist);
 
 			size_type max_size() const;
@@ -184,6 +184,7 @@ namespace U8
 
 			void shrink_to_fit();
 			size_type size() const;
+			String substr(size_type pos = 0, size_type count = npos) const;
 			void swap(String& other);
 
 			static const size_type npos;

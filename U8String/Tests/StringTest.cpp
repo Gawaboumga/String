@@ -638,6 +638,28 @@ SCENARIO("String", "[CORE]")
 
 		}
 
+	}
+
+	GIVEN("One randomString")
+	{
+
+		String randomString(u8"hello world à tous");
+
+		WHEN("We use substr")
+		{
+
+			THEN("This is expected")
+			{
+
+				String sub = randomString.substr(12);
+				REQUIRE(sub == u8"à tous");
+
+				String sub2 = randomString.substr(12, 3);
+				REQUIRE(sub2 == u8"à t");
+
+			}
+
+		}
 
 	}
 

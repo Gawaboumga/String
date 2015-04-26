@@ -1,19 +1,22 @@
 #include <utf8.h>
+#include <cassert>
 #include <iostream>
 
 namespace U8
 {
-	template <class InputIterator>
-	String::String(is_random_access_iterator<InputIterator> first, InputIterator last) :
+	template <typename RandomIter, typename>
+	String::String(RandomIter first, RandomIter last) :
 	m_sharedString(&emptyString)
 	{
 		if (first != last)
 			assign(first, last);
 	}
 
-	template <class InputIterator>
-	void String::assign(is_random_access_iterator<InputIterator> first, InputIterator last)
+	template <typename RandomIter, typename>
+	void String::assign(RandomIter first, RandomIter last)
 	{
+		assert(first < last);
+
 		ensure_ownership();
 
 		size_type distance = static_cast<size_type>(std::distance(first, last));
@@ -27,9 +30,11 @@ namespace U8
 		m_sharedString->size = utf8::distance(first, last);
 	}
 
-	template <class InputIterator>
-	String::iterator String::insert(const_iterator pos, is_random_access_iterator<InputIterator> first, InputIterator last)
+	template <typename RandomIter, typename>
+	String::iterator String::insert(const_iterator pos, RandomIter first, RandomIter last)
 	{
+		assert(first < last);
+
 		ensure_ownership();
 
 		size_type distance = static_cast<size_type>(std::distance(first, last));
