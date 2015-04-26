@@ -50,7 +50,7 @@ namespace U8
 			throw std::invalid_argument("Character class contains only one character.");
 
 		unsigned int i = 0;
-		while (character[i] && i < 4)
+		while (i < 4 && character[i])
 		{
 			byte[i] = character[i];
 			++i;
@@ -146,7 +146,7 @@ namespace U8
 	{
 		char byteArray[5] = { '\0', '\0', '\0', '\0', '\0' };
 		unsigned int i = 0;
-		while (byte[i] && i < 4U)
+		while (i < 4U && byte[i])
 		{
 			byteArray[i] = byte[i];
 			++i;
