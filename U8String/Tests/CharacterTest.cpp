@@ -74,6 +74,20 @@ SCENARIO("Character", "[CORE]")
 
 		}
 
+		WHEN("We test comparison")
+		{
+
+			THEN("These are expected")
+			{
+
+				Character A(u8"à");
+				Character E(u8"é");
+				REQUIRE(A < E);
+				REQUIRE(u8"é" > A);
+
+			}
+
+		}
 
 	}
 

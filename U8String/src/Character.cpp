@@ -77,39 +77,16 @@ namespace U8
 		return *utf8::iterator<const char*>(&byte[0], &byte[0], &byte[4]);
 	}
 
+	int Character::compare(const Character& other, const std::locale& locale) const
+	{
+		auto& f = std::use_facet<std::collate<char>>(locale);
+		return f.compare(byte, byte + number_byte(),
+			other.byte, other.byte + other.number_byte());
+	}
+
 	Character::size_type Character::number_byte() const
 	{
 		return std::strlen(byte);
-	}
-
-	bool Character::operator==(char character) const
-	{
-		return byte[0] == character && byte[1] == '\0';
-	}
-
-	bool Character::operator==(const char* character) const
-	{
-		return code_point() == *utf8::iterator<const char*>(character, character, character + 4);
-	}
-
-	bool Character::operator==(const Character& character) const
-	{
-		return code_point() == character.code_point();
-	}
-
-	bool Character::operator!=(char character) const
-	{
-		return !operator==(character);
-	}
-
-	bool Character::operator!=(const char* character) const
-	{
-		return !operator==(character);
-	}
-
-	bool Character::operator!=(const Character& character) const
-	{
-		return !operator==(character);
 	}
 
 	Character& Character::operator=(char character)
@@ -177,6 +154,37 @@ namespace U8
 		assert(pos < 4);
 
 		return byte[pos];
+	}
+
+	bool operator==(const Character& lhs, const Character& rhs)
+	{
+		return lhs.code_point() == rhs.code_point();
+	}
+
+	bool operator!=(const Character& lhs, const Character& rhs)
+	{
+		return !operator==(lhs, rhs);
+	}
+
+	bool operator<(const Character& lhs, const Character& rhs)
+	{
+		return lhs.compare(rhs) == -1;
+	}
+
+	bool operator<=(const Character& lhs, const Character& rhs)
+	{
+		auto tmp = lhs.compare(rhs);
+		return tmp == -1 || tmp == 0;
+	}
+
+	bool operator>(const Character& lhs, const Character& rhs)
+	{
+		return !operator<=(lhs, rhs);
+	}
+
+	bool operator>=(const Character& lhs, const Character& rhs)
+	{
+		return !operator<(lhs, rhs);
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Character& character)
