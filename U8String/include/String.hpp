@@ -86,19 +86,19 @@ namespace U8
 			const_reverse_iterator crend() const;
 
 			String();
-			explicit String(char character);
-			explicit String(const Character& character);
+			String(char character);
+			String(const Character& character);
 			String(size_type rep, char character);
 			String(size_type rep, const Character& character);
-			String(const std::string& string, size_type pos, size_type count);
 			String(const String& string, size_type pos, size_type count);
 			String(const char* string, size_type count);
-			explicit String(const char* string);
+			String(const char* string);
 			template <typename RandomIter, typename = RequireRandomIter<RandomIter>>
 			String(RandomIter first, RandomIter last);
-			explicit String(const std::string& string);
-			explicit String(const String& string);
+			String(const std::string& string);
+			String(const String& string);
 			String(String&& string);
+			String(std::initializer_list<const char*> init);
 			String(std::initializer_list<Character> init);
 			String(std::initializer_list<char> init);
 			~String();
@@ -109,17 +109,16 @@ namespace U8
 
 			void assign(size_type n, char character);
 			void assign(size_type n, const Character& character);
-			void assign(const std::string& string);
 			void assign(const String& string);
-			void assign(const std::string& string, size_type pos, size_type count = npos);
 			void assign(const String& string, size_type pos, size_type count = npos);
 			void assign(String&& string);
 			void assign(const char* string, size_type count);
 			void assign(const char* string);
 			template <typename RandomIter, typename = RequireRandomIter<RandomIter>>
 			void assign(RandomIter first, RandomIter last);
-			void assign(std::initializer_list<char> init);
+			void assign(std::initializer_list<const char*> init);
 			void assign(std::initializer_list<Character> init);
+			void assign(std::initializer_list<char> init);
 
 			Character at(size_type pos);
 			const Character at(size_type pos) const;
@@ -131,7 +130,6 @@ namespace U8
 			Character character_at(size_type pos) const;
 			void clear(bool keepBuffer = true);
 			uint32_t code_point(size_type pos) const;
-			int compare(const std::string& other, const std::locale& locale = std::locale()) const;
 			int compare(const String& other, const std::locale& locale = std::locale()) const;
 
 			const char* data() const;
@@ -157,14 +155,14 @@ namespace U8
 
 			size_type max_size() const;
 
-			String& operator=(const std::string& other);
 			String& operator=(const String& other);
 			String& operator=(String&& other);
 			String& operator=(const char* string);
 			String& operator=(char character);
 			String& operator=(const Character& character);
-			String& operator=(std::initializer_list<char> init);
+			String& operator=(std::initializer_list<const char*> init);
 			String& operator=(std::initializer_list<Character> init);
+			String& operator=(std::initializer_list<char> init);
 
 			Character operator[](size_type pos);
 			const Character operator[](size_type pos) const;
@@ -228,22 +226,12 @@ namespace U8
 	};
 
 	bool operator==(const String& lhs, const String& rhs);
-	bool operator==(const String& lhs, const std::string& rhs);
-
 	bool operator!=(const String& lhs, const String& rhs);
-	bool operator!=(const String& lhs, const std::string& rhs);
 
 	bool operator<(const String& lhs, const String& rhs);
-	bool operator<(const String& lhs, const std::string& rhs);
-
 	bool operator<=(const String& lhs, const String& rhs);
-	bool operator<=(const String& lhs, const std::string& rhs);
-
 	bool operator>(const String& lhs, const String& rhs);
-	bool operator>(const String& lhs, const std::string& rhs);
-
 	bool operator>=(const String& lhs, const String& rhs);
-	bool operator>=(const String& lhs, const std::string& rhs);
 
 	std::istream& operator>>(std::istream& is, String& str);
 	std::ostream& operator<<(std::ostream& os, const String& str);

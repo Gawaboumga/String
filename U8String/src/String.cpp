@@ -171,13 +171,6 @@ namespace U8
 			assign(rep, character);
 	}
 
-	String::String(const std::string& string, size_type pos, size_type count) :
-	m_sharedString(&emptyString)
-	{
-		if (count > 0)
-			assign(string, pos, count);
-	}
-
 	String::String(const String& string, size_type pos, size_type count) :
 	m_sharedString(&emptyString)
 	{
@@ -203,7 +196,7 @@ namespace U8
 	m_sharedString(&emptyString)
 	{
 		if (!string.empty())
-			assign(string);
+			assign(string.begin(), string.end());
 	}
 
 	String::String(const String& string) :
@@ -219,11 +212,11 @@ namespace U8
 		string.m_sharedString = &emptyString;
 	}
 
-	String::String(std::initializer_list<char> init) :
+	String::String(std::initializer_list<const char*> init) :
 	m_sharedString(&emptyString)
 	{
 		if (init.size() != 0)
-			assign(init.begin(), init.end());
+			assign(init);
 	}
 
 	String::String(std::initializer_list<Character> init) :
@@ -231,6 +224,13 @@ namespace U8
 	{
 		if (init.size() != 0)
 			assign(init);
+	}
+
+	String::String(std::initializer_list<char> init) :
+	m_sharedString(&emptyString)
+	{
+		if (init.size() != 0)
+			assign(init.begin(), init.end());
 	}
 
 	String::~String()
@@ -292,14 +292,6 @@ namespace U8
 			release_string();
 	}
 
-	void String::assign(const std::string& string)
-	{
-		if (!string.empty())
-			assign(string.begin(), string.end());
-		else
-			release_string();
-	}
-
 	void String::assign(const String& string)
 	{
 		release_string();
@@ -307,19 +299,6 @@ namespace U8
 		m_sharedString = string.m_sharedString;
 		if (m_sharedString != &emptyString)
 			m_sharedString->refCount++;
-	}
-
-	void String::assign(const std::string& string, size_type pos, size_type count)
-	{
-		if (count > 0)
-		{
-			if (count == npos)
-				assign(string.begin() + pos, string.end());
-			else
-				assign(string.begin() + pos, string.begin() + pos + count);
-		}
-		else
-			release_string();
 	}
 
 	void String::assign(const String& string, size_type pos, size_type count)
@@ -360,34 +339,54 @@ namespace U8
 			release_string();
 	}
 
-	void String::assign(std::initializer_list<char> init)
+	void String::assign(std::initializer_list<const char*> init)
 	{
 		if (init.size() != 0)
-			assign(init.begin(), init.end());
+		{
+			clear();
+
+			for (auto i : init)
+			{
+				append(String(i));
+			}
+		}
 		else
 			release_string();
 	}
 
 	void String::assign(std::initializer_list<Character> init)
 	{
-		ensure_ownership();
-
-		size_type sum = 0U;
-		for (const auto& character : init)
-			sum += character.number_byte();
-
-		if (sum > capacity())
-			reserve(sum + 1);
-
-		for (auto character : init)
+		if (init.size() != 0)
 		{
-			auto tmp = std::basic_string<char>(character);
-			for (auto i = 0U; i != character.number_byte(); ++i)
-				raw_buffer()[i] = tmp[i % character.number_byte()];
-		}
+			ensure_ownership();
 
-		m_sharedString->buffer[sum] = '\0'; // String is terminated by a '\0'.
-		m_sharedString->size = std::distance(init.begin(), init.end());
+			size_type sum = 0U;
+			for (const auto& character : init)
+				sum += character.number_byte();
+
+			if (sum > capacity())
+				reserve(sum + 1);
+
+			for (auto character : init)
+			{
+				auto tmp = std::basic_string<char>(character);
+				for (auto i = 0U; i != character.number_byte(); ++i)
+					raw_buffer()[i] = tmp[i % character.number_byte()];
+			}
+
+			m_sharedString->buffer[sum] = '\0'; // String is terminated by a '\0'.
+			m_sharedString->size = std::distance(init.begin(), init.end());
+		}
+		else
+			release_string();
+	}
+
+	void String::assign(std::initializer_list<char> init)
+	{
+		if (init.size() != 0)
+			assign(init.begin(), init.end());
+		else
+			release_string();
 	}
 
 	Character String::at(size_type pos)
@@ -439,14 +438,6 @@ namespace U8
 		}
 
 		return *it;
-	}
-
-	int String::compare(const std::string& other, const std::locale& locale) const
-	{
-		auto& f = std::use_facet<std::collate<char>>(locale);
-		std::basic_string<char> s1(data()), s2(other);
-		return f.compare(s1.data(), s1.data() + s1.size(),
-			other.data(), other.data() + other.size());
 	}
 
 	int String::compare(const String& other, const std::locale& locale) const
@@ -639,13 +630,6 @@ namespace U8
 		return npos;
 	}
 
-	String& String::operator=(const std::string& other)
-	{
-		assign(other);
-
-		return *this;
-	}
-
 	String& String::operator=(const String& other)
 	{
 		if (this != &other)
@@ -682,7 +666,7 @@ namespace U8
 		return *this;
 	}
 
-	String& String::operator=(std::initializer_list<char> init)
+	String& String::operator=(std::initializer_list<const char*> init)
 	{
 		assign(init);
 
@@ -690,6 +674,13 @@ namespace U8
 	}
 
 	String& String::operator=(std::initializer_list<Character> init)
+	{
+		assign(init);
+
+		return *this;
+	}
+
+	String& String::operator=(std::initializer_list<char> init)
 	{
 		assign(init);
 
@@ -937,15 +928,18 @@ namespace U8
 
 	bool operator==(const String& lhs, const String& rhs)
 	{
-		return std::equal(lhs.begin(), lhs.end(), rhs.begin());
-	}
+		// std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); c++14
+		auto first1 = lhs.begin();
+		auto last1 = lhs.end();
+		auto first2 = rhs.begin();
+		auto last2 = rhs.end();
 
-	bool operator==(const String& lhs, const std::string& rhs)
-	{
-		if (rhs.empty())
-			return lhs.empty() == true;
-
-		return std::equal(lhs.data(), lhs.data() + std::strlen(lhs.data()), rhs.begin());
+		for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
+			if (!(*first1 == *first2)) {
+				return false;
+			}
+		}
+		return first1 == last1 && first2 == last2;
 	}
 
 	bool operator!=(const String& lhs, const String& rhs)
@@ -953,17 +947,7 @@ namespace U8
 		return !operator==(lhs, rhs);
 	}
 
-	bool operator!=(const String& lhs, const std::string& rhs)
-	{
-		return !operator==(lhs, rhs);
-	}
-
 	bool operator<(const String& lhs, const String& rhs)
-	{
-		return lhs.compare(rhs) == -1;
-	}
-
-	bool operator<(const String& lhs, const std::string& rhs)
 	{
 		return lhs.compare(rhs) == -1;
 	}
@@ -974,27 +958,12 @@ namespace U8
 		return tmp == -1 || tmp == 0;
 	}
 
-	bool operator<=(const String& lhs, const std::string& rhs)
-	{
-		auto tmp = lhs.compare(rhs);
-		return tmp == -1 || tmp == 0;
-	}
-
 	bool operator>(const String& lhs, const String& rhs)
-	{
-		return !operator<=(lhs, rhs);
-	}
-	bool operator>(const String& lhs, const std::string& rhs)
 	{
 		return !operator<=(lhs, rhs);
 	}
 
 	bool operator>=(const String& lhs, const String& rhs)
-	{
-		return !operator<(lhs, rhs);
-	}
-
-	bool operator>=(const String& lhs, const std::string& rhs)
 	{
 		return !operator<(lhs, rhs);
 	}

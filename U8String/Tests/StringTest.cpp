@@ -53,9 +53,9 @@ SCENARIO("String", "[CORE]")
 				}
 
 				{
-					String sizeTwoCapacityThree(u8"Téste", 1, 3);
-					REQUIRE(sizeTwoCapacityThree.capacity() >= 3);
-					REQUIRE(sizeTwoCapacityThree.size() == 2);
+					String sizeThreeCapacityFour(u8"Téste", 1, 3);
+					REQUIRE(sizeThreeCapacityFour.capacity() >= 4);
+					REQUIRE(sizeThreeCapacityFour.size() == 3);
 				}
 
 
@@ -167,9 +167,9 @@ SCENARIO("String", "[CORE]")
 				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 2);
 
-				emptyString = {u8"ç", u8"à", u8"v"};
-				REQUIRE(emptyString.capacity() >= 5);
-				REQUIRE(emptyString.size() == 3);
+				emptyString = {u8"ç", u8"à", u8"v", u8"a"};
+				REQUIRE(emptyString.capacity() >= 6);
+				REQUIRE(emptyString.size() == 4);
 
 			}
 
@@ -188,9 +188,10 @@ SCENARIO("String", "[CORE]")
 			THEN("This is expected")
 			{
 				REQUIRE(randomString != u8"Tél");
-				REQUIRE(randomString != std::string(u8"Telt"));
-				REQUIRE(randomString == std::string(u8"Télt"));
-				REQUIRE(randomString != std::string(u8"Tél"));
+				REQUIRE(u8"Tél" != randomString);
+				REQUIRE(randomString != u8"Telt");
+				REQUIRE(randomString == u8"Télt");
+				REQUIRE(randomString != u8"Tél");
 				REQUIRE(randomString == randomString);
 
 			}
@@ -374,7 +375,7 @@ SCENARIO("String", "[CORE]")
 
 				abe = "";
 				abe.shrink_to_fit();
-				REQUIRE(abe == std::string(""));
+				REQUIRE(abe == "");
 				REQUIRE(abe.capacity() == 0);
 				REQUIRE(abe.size() == 0);
 
@@ -629,6 +630,16 @@ SCENARIO("String", "[CORE]")
 					String A(u8"à");
 					String E(u8"é");
 					REQUIRE(A < E);
+
+				}
+
+				{
+
+					std::vector<String> v { u8"жил", u8"был", u8"кот" };
+					std::sort(v.begin(), v.end(), [](const String& lhs, const String& rhs) { return lhs < rhs; });
+					REQUIRE(v[0] == u8"был");
+					REQUIRE(v[1] == u8"жил");
+					REQUIRE(v[2] == u8"кот");
 
 				}
 
