@@ -77,16 +77,16 @@ SCENARIO("Character", "[CORE]")
 		WHEN("We test comparison")
 		{
 
-			/*THEN("These are expected")
+			THEN("These are expected")
 			{
 
 				Character American(u8"ä");
 				Character Swedish(u8"å");
 
-				REQUIRE(American.compare(Swedish, std::locale("en_US.utf8")) < 0);
+				REQUIRE(American.compare(Swedish, std::locale("C")) < 0);
 				REQUIRE(American.compare(Swedish, std::locale("sv_SE.utf8")) > 0); // sudo locale-gen sv_SE.utf8 or comment it :)
 
-			}*/
+			}
 
 		}
 

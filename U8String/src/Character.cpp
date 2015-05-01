@@ -79,10 +79,9 @@ namespace U8
 
 	int Character::compare(const Character& other, const std::locale& locale) const
 	{
-		std::cout << &byte[0] << " " << &other.byte[0] << std::endl;
 		auto& f = std::use_facet<std::collate<char>>(locale);
-		return f.compare(&byte[0], &byte[0] + number_byte(),
-			&other.byte[0], &other.byte[0] + other.number_byte());
+		return f.compare(byte, byte + number_byte(),
+			other.byte, other.byte + other.number_byte());
 	}
 
 	Character::size_type Character::number_byte() const
