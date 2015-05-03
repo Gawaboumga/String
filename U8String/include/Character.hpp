@@ -38,6 +38,19 @@ namespace U8
 			uint32_t code_point() const;
 			int compare(const Character& character, const std::locale& locale = std::locale()) const;
 
+			bool isalnum(const std::locale& locale = std::locale()) const;
+			bool isalpha(const std::locale& locale = std::locale()) const;
+			//bool isblank(const std::locale& locale = std::locale()) const;
+			bool iscntrl(const std::locale& locale = std::locale()) const;
+			bool isdigit(const std::locale& locale = std::locale()) const;
+			bool isgraph(const std::locale& locale = std::locale()) const;
+			bool islower(const std::locale& locale = std::locale()) const;
+			bool isprint(const std::locale& locale = std::locale()) const;
+			bool ispunct(const std::locale& locale = std::locale()) const;
+			bool isspace(const std::locale& locale = std::locale()) const;
+			bool isupper(const std::locale& locale = std::locale()) const;
+			bool isxdigit(const std::locale& locale = std::locale()) const;
+
 			size_type number_byte() const;
 
 			Character& operator=(char character);

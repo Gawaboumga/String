@@ -84,9 +84,84 @@ namespace U8
 			other.byte, other.byte + other.number_byte());
 	}
 
+	bool Character::isalnum(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::alnum;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	bool Character::isalpha(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::alpha;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	/*bool Character::isblank(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::blank;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}*/
+
+	bool Character::iscntrl(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::cntrl;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	bool Character::isdigit(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::digit;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	bool Character::isgraph(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::graph;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	bool Character::islower(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::lower;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	bool Character::isprint(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::print;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	bool Character::ispunct(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::punct;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	bool Character::isspace(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::space;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	bool Character::isupper(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::upper;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
+	bool Character::isxdigit(const std::locale& locale) const
+	{
+		auto tmp = std::ctype_base::xdigit;
+		return std::use_facet<std::ctype<char>>(locale).is(byte, byte + number_byte(), &tmp);
+	}
+
 	Character::size_type Character::number_byte() const
 	{
-		return std::strlen(byte);
+		auto i = 0U;
+		while (i < 4 && byte[i])
+			++i;
+		return i;
 	}
 
 	Character& Character::operator=(char character)
