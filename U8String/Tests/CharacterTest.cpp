@@ -1,6 +1,8 @@
 #include <catch.hpp>
 #include <Character.hpp>
 
+#include <iostream>
+
 SCENARIO("Character", "[CORE]")
 {
 
@@ -87,6 +89,23 @@ SCENARIO("Character", "[CORE]")
 				REQUIRE(American.compare(Swedish, std::locale("sv_SE.utf8")) > 0); // sudo locale-gen sv_SE.utf8 or comment it :)
 
 			}
+
+		}
+
+		WHEN("We do upper and lower")
+		{
+
+			THEN("Griek letters are funny")
+			{
+
+				Character upperSigma(u8"Σ");
+				REQUIRE(u8"σ" == upperSigma.tolower(std::locale("en_US.utf8")));
+
+				Character lowerSigma(u8"σ");
+				REQUIRE(u8"Σ" == lowerSigma.toupper(std::locale("en_US.utf8")));
+
+			}
+
 
 		}
 

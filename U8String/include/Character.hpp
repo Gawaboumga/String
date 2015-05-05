@@ -60,6 +60,9 @@ namespace U8
 
 			operator std::basic_string<char> () const;
 
+			Character tolower(const std::locale& locale = std::locale()) const;
+			Character toupper(const std::locale& locale = std::locale()) const;
+
 		private:
 
 			Character(size_type position, const String* string);

@@ -207,6 +207,48 @@ namespace U8
 		return std::basic_string<char>(byteArray);
 	}
 
+	Character Character::tolower(const std::locale& locale) const
+	{
+		auto oldLocale = std::locale::global(locale);
+
+		wchar_t wstr;
+		std::mbstowcs(&wstr, byte, 1);
+
+		auto& f = std::use_facet<std::ctype<wchar_t>>(locale);
+		wchar_t up = f.tolower(wstr);
+
+		Character tmp;
+
+		auto nbBytes = std::wcstombs(tmp.byte, &up, 4);
+		if (nbBytes < 4)
+			tmp.byte[nbBytes] = '\0';
+
+		std::locale::global(oldLocale);
+
+		return tmp;
+	}
+
+	Character Character::toupper(const std::locale& locale) const
+	{
+		auto oldLocale = std::locale::global(locale);
+
+		wchar_t wstr;
+		std::mbstowcs(&wstr, byte, 1);
+
+		auto& f = std::use_facet<std::ctype<wchar_t>>(locale);
+		wchar_t up = f.toupper(wstr);
+
+		Character tmp;
+
+		auto nbBytes = std::wcstombs(tmp.byte, &up, 4);
+		if (nbBytes < 4)
+			tmp.byte[nbBytes] = '\0';
+
+		std::locale::global(oldLocale);
+
+		return tmp;
+	}
+
 	Character::Character(size_type position, const String* string) :
 		m_position(position), m_string(const_cast<String*>(string))
 	{
