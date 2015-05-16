@@ -38,6 +38,10 @@ namespace U8
 			uint32_t code_point() const;
 			int compare(const Character& character, const std::locale& locale = std::locale()) const;
 
+			static Character fromUTF16(const char16_t character[2], const std::locale& locale = std::locale());
+			static Character fromUTF32(const char32_t character[2], const std::locale& locale = std::locale());
+			static Character fromWide(const wchar_t* character, const std::locale& locale = std::locale());
+
 			bool isalnum(const std::locale& locale = std::locale()) const;
 			bool isalpha(const std::locale& locale = std::locale()) const;
 			//bool isblank(const std::locale& locale = std::locale()) const;
@@ -63,6 +67,8 @@ namespace U8
 			Character tolower(const std::locale& locale = std::locale()) const;
 			Character toupper(const std::locale& locale = std::locale()) const;
 
+			friend std::istream& operator>>(std::istream& is, Character& character);
+
 		private:
 
 			Character(size_type position, const String* string);
@@ -84,6 +90,7 @@ namespace U8
 	bool operator>=(const Character& lhs, const Character& rhs);
 
 	std::ostream& operator<<(std::ostream& os, const Character& character);
+	std::istream& operator>>(std::istream& is, Character& character);
 
 } // U8
 

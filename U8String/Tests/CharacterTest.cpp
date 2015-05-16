@@ -32,7 +32,7 @@ SCENARIO("Character", "[CORE]")
 				{
 					Character charUTF8(u8"a");
 					// Because locale works perfectly as I want !
-					charUTF8 = std::toupper(std::string(charUTF8)[0], std::locale("en_US.utf8"));
+					charUTF8 = charUTF8.toupper(std::locale("en_US.utf8"));
 					CHECK(charUTF8 == u8"A");
 					CHECK(charUTF8 == "A");
 					CHECK(charUTF8 == 'A');
@@ -106,6 +106,21 @@ SCENARIO("Character", "[CORE]")
 
 			}
 
+
+		}
+
+		WHEN("We have different unicode")
+		{
+
+			THEN("They must be equal to utf8")
+			{
+
+				Character e(u8"é");
+				/*REQUIRE(e == Character::fromUTF16(u"é"));
+				REQUIRE(e == Character::fromUTF32(U"é"));
+				REQUIRE(e == Character::fromWide(L"é"));*/
+
+			}
 
 		}
 

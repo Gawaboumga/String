@@ -84,6 +84,45 @@ namespace U8
 			other.byte, other.byte + other.number_byte());
 	}
 
+	Character Character::fromUTF16(const char16_t character[2], const std::locale& locale)
+	{
+		std::mbstate_t mb = std::mbstate_t();
+		auto& f = std::use_facet<std::codecvt<char16_t, char, std::mbstate_t>>(locale);
+		const char16_t* from_next;
+		char* to_next;
+		Character tmp;
+		f.out(mb, character, &character[2], from_next,
+				  tmp.byte, &tmp.byte[4], to_next);
+
+		return tmp;
+	}
+
+	Character Character::fromUTF32(const char32_t character[2], const std::locale& locale)
+	{
+		std::mbstate_t mb = std::mbstate_t();
+		auto& f = std::use_facet<std::codecvt<char32_t, char, std::mbstate_t>>(locale);
+		const char32_t* from_next;
+		char* to_next;
+		Character tmp;
+		f.out(mb, character, &character[2], from_next,
+				  tmp.byte, &tmp.byte[4], to_next);
+
+		return tmp;
+	}
+
+	Character Character::fromWide(const wchar_t* character, const std::locale& locale)
+	{
+		std::mbstate_t mb = std::mbstate_t();
+		auto& f = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(locale);
+		const wchar_t* from_next;
+		char* to_next;
+		Character tmp;
+		f.out(mb, character, &character[2], from_next,
+				  tmp.byte, &tmp.byte[4], to_next);
+
+		return tmp;
+	}
+
 	bool Character::isalnum(const std::locale& locale) const
 	{
 		auto tmp = std::ctype_base::alnum;
@@ -307,6 +346,23 @@ namespace U8
 	std::ostream& operator<<(std::ostream& os, const Character& character)
 	{
 		return os << std::string(character);
+	}
+
+	std::istream& operator>>(std::istream& is, Character& character)
+	{
+		char c = '\0';
+		int i = 0;
+
+		while (i < 4)
+		{
+			is.get(c);
+			character.byte[i] = c;
+			if (c == '\0')
+				i = 4;
+			++i;
+		}
+
+		return is;
 	}
 
 } // U8
