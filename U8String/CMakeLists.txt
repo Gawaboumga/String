@@ -25,7 +25,7 @@ set(SOURCES_TESTS ${Tests})
 set(CATCH "extlibs/Catch/")
 set(UTF8 "extlibs/utf8_v2_3_4/source")
 
-set(EXETESTS "test")
+set(EXETESTS "TestUTF8")
 message(STATUS "Add executable ${EXETESTS}")
 include_directories(${INC_DIR} ${CATCH} ${UTF8})
 add_executable(${EXETESTS} ${SOURCE} ${SOURCES_TESTS})
