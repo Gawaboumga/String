@@ -177,6 +177,49 @@ SCENARIO("String", "[CORE]")
 
 	}
 
+	GIVEN("Two strings")
+	{
+
+		String stringOne(u8"stringOne");
+		String stringTwo(u8"stringTwo");
+
+		WHEN("We swap")
+		{
+
+			String oldStringOne(u8"stringOne");
+			String oldStringTwo(u8"stringTwo");
+
+			THEN("Value was swapped")
+			{
+				std::swap(stringOne, stringTwo);
+
+				REQUIRE(stringOne == oldStringTwo);
+				REQUIRE(stringTwo == oldStringOne);
+
+				stringOne.swap(stringTwo);
+
+				REQUIRE(stringOne == oldStringOne);
+				REQUIRE(stringTwo == oldStringTwo);
+
+			}
+
+			THEN("We move")
+			{
+
+				String stringThree(std::move(stringTwo));
+				REQUIRE(stringThree == oldStringTwo);
+				REQUIRE(stringTwo == "");
+
+				String tmp(u8"tmp");
+				tmp = std::move(stringThree);
+				REQUIRE(tmp == oldStringTwo);
+
+			}
+
+		}
+
+	}
+
 	GIVEN("One string")
 	{
 

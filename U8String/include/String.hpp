@@ -97,7 +97,7 @@ namespace U8
 			String(RandomIter first, RandomIter last);
 			String(const std::string& string);
 			String(const String& string);
-			String(String&& string);
+			String(String&& string) noexcept;
 			String(std::initializer_list<const char*> init);
 			String(std::initializer_list<Character> init);
 			String(std::initializer_list<char> init);
@@ -156,7 +156,7 @@ namespace U8
 			size_type max_size() const;
 
 			String& operator=(const String& other);
-			String& operator=(String&& other);
+			String& operator=(String&& other) noexcept;
 			String& operator=(const char* string);
 			String& operator=(char character);
 			String& operator=(const Character& character);

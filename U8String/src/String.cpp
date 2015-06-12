@@ -206,7 +206,7 @@ namespace U8
 			m_sharedString->refCount++;
 	}
 
-	String::String(String&& string) :
+	String::String(String&& string) noexcept :
 	m_sharedString(string.m_sharedString)
 	{
 		string.m_sharedString = &emptyString;
@@ -638,9 +638,9 @@ namespace U8
 		return *this;
 	}
 
-	String& String::operator=(String&& other)
+	String& String::operator=(String&& other) noexcept
 	{
-		std::swap(m_sharedString, other.m_sharedString);
+		String(std::move(other)).swap(*this);
 
 		return *this;
 	}
