@@ -20,8 +20,9 @@ class CPPGenerator:
 
     def __writeIncludes(self, ofile):
 
-        ofile.write("#include \"" + self.__output + ".hpp" + "\"\n\n")
-        ofile.write("#include <algorithm>\n\n")
+        ofile.write("#include <" + self.__output + ".hpp" + ">\n\n")
+        ofile.write("#include <algorithm>\n")
+        ofile.write("#include <string>\n\n")
 
     def __writeFunctions(self, ofile):
 
@@ -102,8 +103,8 @@ class CPPGenerator:
 
     def __writeDatas(self, ofile):
 
-        self.__writeStatic(ofile, self.__datas[0], "m_bidirectionals", "BidirectionalCategory", True)
-        self.__writeStatic(ofile, self.__datas[1], "m_categories", "GeneralCategory", True)
+        self.__writeStatic(ofile, self.__datas[0], "m_bidirectionals", "BidirectionalCategory", True, True)
+        self.__writeStatic(ofile, self.__datas[1], "m_categories", "GeneralCategory", True, True)
         self.__writeStatic(ofile, self.__datas[2], "m_combinings", "unsigned char")
         self.__writeStatic(ofile, self.__datas[3], "m_lowers", "Unicode", True)
         self.__writeStatic(ofile, self.__datas[4], "m_mirrors", "bool")
@@ -111,7 +112,7 @@ class CPPGenerator:
         self.__writeStatic(ofile, self.__datas[6], "m_uppers", "Unicode", True)
 
 
-    def __writeStatic(self, ofile, data, container, type, scopedType = False):
+    def __writeStatic(self, ofile, data, container, type, scopedType = False, scopedEnum = False):
 
         if scopedType:
             ofile.write("std::array<std::pair<" + self.__output + "::Unicode, " + self.__output + "::" + type + ">, " + str(len(data)) + "> " + self.__output + "::" + container + " { {\n")
@@ -122,8 +123,12 @@ class CPPGenerator:
                 for tupleData in data:
                     ofile.write("\t{" + str(tupleData[0]) + ", " + str(tupleData[1]).lower() + "},\n")
             else:
-                for tupleData in data:
-                    ofile.write("\t{" + str(tupleData[0]) + ", " + str(tupleData[1]) + "},\n")
+                if not scopedEnum:
+                    for tupleData in data:
+                        ofile.write("\t{" + str(tupleData[0]) + ", " + str(tupleData[1]) + "},\n")
+                else:
+                    for tupleData in data:
+                        ofile.write("\t{" + str(tupleData[0]) + ", " + type + "::" + str(tupleData[1]) + "},\n")
         else:
             for tupleData in data:
                 ofile.write("\t{" + str(tupleData[0]) + ", 0x" + str(tupleData[1]) + "},\n")

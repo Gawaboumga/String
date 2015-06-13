@@ -84,34 +84,33 @@ namespace U8
 			other.byte, other.byte + other.number_byte());
 	}
 
-	Character Character::fromUTF16(const char16_t character[2], const std::locale& locale)
+	Character Character::fromUTF16(const char16_t character[2])
 	{
-		std::mbstate_t mb = std::mbstate_t();
-		auto& f = std::use_facet<std::codecvt<char16_t, char, std::mbstate_t>>(locale);
-		const char16_t* from_next;
-		char* to_next;
 		Character tmp;
-		f.out(mb, character, &character[2], from_next,
-				  tmp.byte, &tmp.byte[4], to_next);
+		char* end = utf8::utf16to8(character, character + (character[1] ? 2 : 1), tmp.byte);
+		if (end != tmp.byte + 4)
+			*end = '\0';
 
 		return tmp;
 	}
 
-	Character Character::fromUTF32(const char32_t character[2], const std::locale& locale)
+	Character Character::fromUTF32(const char32_t character[1])
 	{
-		std::mbstate_t mb = std::mbstate_t();
-		auto& f = std::use_facet<std::codecvt<char32_t, char, std::mbstate_t>>(locale);
-		const char32_t* from_next;
-		char* to_next;
 		Character tmp;
-		f.out(mb, character, &character[2], from_next,
-				  tmp.byte, &tmp.byte[4], to_next);
+		char* end = utf8::utf32to8(character, character + 1, tmp.byte);
+		if (end != tmp.byte + 4)
+			*end = '\0';
 
 		return tmp;
 	}
 
 	Character Character::fromWide(const wchar_t* character, const std::locale& locale)
 	{
+		/*typedef std::codecvt_utf8<wchar_t> convert_wide_to_utf8;
+		std::wstring_convert<convert_wide_to_utf8, wchar_t> converterWUTF8;
+
+		return converterWUTF8.to_bytes(character);*/
+
 		std::mbstate_t mb = std::mbstate_t();
 		auto& f = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(locale);
 		const wchar_t* from_next;
@@ -246,44 +245,23 @@ namespace U8
 		return std::basic_string<char>(byteArray);
 	}
 
-	Character Character::tolower(const std::locale& locale) const
+	Character Character::tolower(const std::locale& /*locale*/) const
 	{
-		auto oldLocale = std::locale::global(locale);
-
-		wchar_t wstr;
-		std::mbstowcs(&wstr, byte, 1);
-
-		auto& f = std::use_facet<std::ctype<wchar_t>>(locale);
-		wchar_t up = f.tolower(wstr);
+		//! Todo use locale for azeri and so on http://unicode.org/faq/casemap_charprop.html
+		UnicodeData::Unicode unicode = UnicodeData::lowercase_mapping(code_point());
 
 		Character tmp;
-
-		auto nbBytes = std::wcstombs(tmp.byte, &up, 4);
-		if (nbBytes < 4)
-			tmp.byte[nbBytes] = '\0';
-
-		std::locale::global(oldLocale);
+		tmp.fromCodePoint(unicode);
 
 		return tmp;
 	}
 
-	Character Character::toupper(const std::locale& locale) const
+	Character Character::toupper(const std::locale& /*locale*/) const
 	{
-		auto oldLocale = std::locale::global(locale);
-
-		wchar_t wstr;
-		std::mbstowcs(&wstr, byte, 1);
-
-		auto& f = std::use_facet<std::ctype<wchar_t>>(locale);
-		wchar_t up = f.toupper(wstr);
+		UnicodeData::Unicode unicode = UnicodeData::uppercase_mapping(code_point());
 
 		Character tmp;
-
-		auto nbBytes = std::wcstombs(tmp.byte, &up, 4);
-		if (nbBytes < 4)
-			tmp.byte[nbBytes] = '\0';
-
-		std::locale::global(oldLocale);
+		tmp.fromCodePoint(unicode);
 
 		return tmp;
 	}
@@ -303,6 +281,13 @@ namespace U8
 		{
 			byte[i] = '\0';
 		}
+	}
+
+	void Character::fromCodePoint(UnicodeData::Unicode codePoint)
+	{
+		char* end = utf8::append(codePoint, byte);
+		if (end != byte + 4)
+			*end = '\0';
 	}
 
 	char Character::operator[](unsigned char pos) const

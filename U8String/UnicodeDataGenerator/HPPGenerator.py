@@ -46,12 +46,14 @@ class HPPGenerator:
 
     def __writeUsing(self, ofile):
 
-        ofile.write("\tusing Unicode = unsigned int;\n\n")
+        ofile.write("\tpublic:\n\n")
+
+        ofile.write("\t\tusing Unicode = unsigned int;\n\n")
 
     def __writeEnum(self, ofile, enum):
 
         enumerationName = str(enum)[7:-2].replace("Enum", "")
-        ofile.write("\t\tenum " + enumerationName + "\n")
+        ofile.write("\t\tenum class " + enumerationName + "\n")
         ofile.write("\t\t{\n")
         for member in enum.__members__:
             ofile.write("\t\t\t" + member + ",\n")
@@ -59,7 +61,6 @@ class HPPGenerator:
 
     def __writePublic(self, ofile):
 
-        ofile.write("\tpublic:\n\n")
 
         for enum in [BidirectionalCategoryEnum, GeneralCategoryEnum]:
             self.__writeEnum(ofile, enum)

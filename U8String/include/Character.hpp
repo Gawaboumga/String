@@ -1,6 +1,8 @@
 #ifndef __CHARACTER_HPP__
 #define __CHARACTER_HPP__
 
+#include <UnicodeData.hpp>
+
 #include <cstdint>
 #include <locale>
 #include <string>
@@ -38,13 +40,13 @@ namespace U8
 			uint32_t code_point() const;
 			int compare(const Character& character, const std::locale& locale = std::locale()) const;
 
-			static Character fromUTF16(const char16_t character[2], const std::locale& locale = std::locale());
-			static Character fromUTF32(const char32_t character[2], const std::locale& locale = std::locale());
+			static Character fromUTF16(const char16_t character[2]);
+			static Character fromUTF32(const char32_t character[1]);
 			static Character fromWide(const wchar_t* character, const std::locale& locale = std::locale());
 
 			bool isalnum(const std::locale& locale = std::locale()) const;
 			bool isalpha(const std::locale& locale = std::locale()) const;
-			//bool isblank(const std::locale& locale = std::locale()) const;
+			bool isblank(const std::locale& locale = std::locale()) const;
 			bool iscntrl(const std::locale& locale = std::locale()) const;
 			bool isdigit(const std::locale& locale = std::locale()) const;
 			bool isgraph(const std::locale& locale = std::locale()) const;
@@ -72,6 +74,8 @@ namespace U8
 		private:
 
 			Character(size_type position, const String* string);
+
+			void fromCodePoint(UnicodeData::Unicode codePoint);
 
 			char operator[](unsigned char pos) const;
 

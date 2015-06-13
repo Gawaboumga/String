@@ -14,6 +14,7 @@ class UnicodeDataParser():
         with open(fileName, "r") as ifile:
 
             for line in ifile:
+
                 line = line.rstrip()
                 tokens = line.split(";")
 

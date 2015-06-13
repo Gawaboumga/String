@@ -41,10 +41,9 @@ def main(argv):
     listTitle = []
     listUpper = []
 
-    it = 0
     for data in datas:
 
-        i = hex(it)
+        i = "0x" + data.getCodeValue()
 
         if oldBidi != data.getBidi():
             listBidi.append((i, str(oldBidi).replace("BidirectionalCategoryEnum.", "")))
@@ -74,8 +73,6 @@ def main(argv):
 
         if data.getUpper() is not None:
             listUpper.append((i, data.getUpper()))
-
-        it += 1
 
     numbers = [len(listBidi), len(listCate), len(listCombi), len(listLower), len(listMirror), len(listTitle), len(listUpper)]
 

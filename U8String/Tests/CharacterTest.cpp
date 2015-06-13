@@ -116,9 +116,14 @@ SCENARIO("Character", "[CORE]")
 			{
 
 				Character e(u8"é");
-				/*REQUIRE(e == Character::fromUTF16(u"é"));
+				REQUIRE(e == Character::fromUTF16(u"é"));
 				REQUIRE(e == Character::fromUTF32(U"é"));
-				REQUIRE(e == Character::fromWide(L"é"));*/
+				//REQUIRE(e == Character::fromWide(L"é"));
+
+				Character Gclef(u8"\U0001D11E");
+				REQUIRE(Gclef == Character::fromUTF16(u"\U0001D11E"));
+				REQUIRE(Gclef == Character::fromUTF32(U"\U0001D11E"));
+				//REQUIRE(Gclef == Character::fromWide(L"\U0001D11E"));
 
 			}
 

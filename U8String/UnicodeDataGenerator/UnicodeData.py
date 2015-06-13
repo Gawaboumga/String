@@ -51,6 +51,14 @@ class UnicodeData():
         else:
             raise Exception
 
+    def getCodeValue(self):
+
+        return self.__codeValue
+
+    def getName(self):
+
+        return self.__characterName
+
     def getLower(self):
 
         if len(self.__lowercaseMapping) == 0:
