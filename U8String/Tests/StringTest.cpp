@@ -1,6 +1,8 @@
 #include <catch.hpp>
 #include <String.hpp>
 
+#include <regex>
+
 SCENARIO("String", "[CORE]")
 {
 
@@ -710,6 +712,32 @@ SCENARIO("String", "[CORE]")
 
 				String sub2 = randomString.substr(12, 3);
 				REQUIRE(sub2 == u8"à t");
+
+			}
+
+		}
+
+	}
+
+	GIVEN("One random string and unsorted string")
+	{
+
+		String randomString(u8"hello world à tous et à toutes");
+
+		WHEN("We use STL")
+		{
+
+			THEN("It should behave normally")
+			{
+
+				REQUIRE(std::count(randomString.begin(), randomString.end(), u8"à") == 2);
+
+				std::cout << randomString << " " << randomString.size() << std::endl;
+				randomString.erase(std::remove_if(randomString.begin(), randomString.end(),	[](Character x) {
+					return x == u8"o";
+				}), randomString.end());
+
+				REQUIRE(randomString == u8"hell wrld à tus et à tutes");
 
 			}
 

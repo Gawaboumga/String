@@ -72,9 +72,19 @@ namespace U8
 		}
 	}
 
+	UnicodeData::GeneralCategory Character::category() const
+	{
+		return UnicodeData::general_category(code_point());
+	}
+
 	uint32_t Character::code_point() const
 	{
 		return *utf8::iterator<const char*>(&byte[0], &byte[0], &byte[4]);
+	}
+
+	unsigned char Character::combining_class() const
+	{
+		return UnicodeData::canonical_combining_classes(code_point());
 	}
 
 	int Character::compare(const Character& other, const std::locale& locale) const
@@ -84,42 +94,14 @@ namespace U8
 			other.byte, other.byte + other.number_byte());
 	}
 
-	Character Character::fromUTF16(const char16_t character[2])
+	UnicodeData::BidirectionalCategory Character::direction() const
 	{
-		Character tmp;
-		char* end = utf8::utf16to8(character, character + (character[1] ? 2 : 1), tmp.byte);
-		if (end != tmp.byte + 4)
-			*end = '\0';
-
-		return tmp;
+		return UnicodeData::bidirectional_category(code_point());
 	}
 
-	Character Character::fromUTF32(const char32_t character[1])
+	bool Character::has_mirrored() const
 	{
-		Character tmp;
-		char* end = utf8::utf32to8(character, character + 1, tmp.byte);
-		if (end != tmp.byte + 4)
-			*end = '\0';
-
-		return tmp;
-	}
-
-	Character Character::fromWide(const wchar_t* character, const std::locale& locale)
-	{
-		/*typedef std::codecvt_utf8<wchar_t> convert_wide_to_utf8;
-		std::wstring_convert<convert_wide_to_utf8, wchar_t> converterWUTF8;
-
-		return converterWUTF8.to_bytes(character);*/
-
-		std::mbstate_t mb = std::mbstate_t();
-		auto& f = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(locale);
-		const wchar_t* from_next;
-		char* to_next;
-		Character tmp;
-		f.out(mb, character, &character[2], from_next,
-				  tmp.byte, &tmp.byte[4], to_next);
-
-		return tmp;
+		return UnicodeData::mirrored(code_point());
 	}
 
 	bool Character::isalnum(const std::locale& locale) const
@@ -232,6 +214,16 @@ namespace U8
 		return *this;
 	}
 
+	Character& Character::operator=(Character&& character)
+	{
+		if (m_string)
+			m_string->replace(m_position, 1, character);
+
+		std::copy(character.byte, character.byte + 4, byte);
+		m_position = character.m_position;
+		m_string = character.m_string;
+	}
+
 	Character::operator std::basic_string<char> () const
 	{
 		char byteArray[5] = { '\0', '\0', '\0', '\0', '\0' };
@@ -256,12 +248,60 @@ namespace U8
 		return tmp;
 	}
 
+	Character Character::totitlecase(const std::locale& /*locale*/) const
+	{
+		UnicodeData::Unicode unicode = UnicodeData::titlecase_mapping(code_point());
+
+		Character tmp;
+		tmp.fromCodePoint(unicode);
+
+		return tmp;
+	}
+
 	Character Character::toupper(const std::locale& /*locale*/) const
 	{
 		UnicodeData::Unicode unicode = UnicodeData::uppercase_mapping(code_point());
 
 		Character tmp;
 		tmp.fromCodePoint(unicode);
+
+		return tmp;
+	}
+
+	Character Character::fromUTF16(const char16_t character[2])
+	{
+		Character tmp;
+		char* end = utf8::utf16to8(character, character + (character[1] ? 2 : 1), tmp.byte);
+		if (end != tmp.byte + 4)
+			*end = '\0';
+
+		return tmp;
+	}
+
+	Character Character::fromUTF32(const char32_t character[1])
+	{
+		Character tmp;
+		char* end = utf8::utf32to8(character, character + 1, tmp.byte);
+		if (end != tmp.byte + 4)
+			*end = '\0';
+
+		return tmp;
+	}
+
+	Character Character::fromWide(const wchar_t* character, const std::locale& locale)
+	{
+		/*typedef std::codecvt_utf8<wchar_t> convert_wide_to_utf8;
+		std::wstring_convert<convert_wide_to_utf8, wchar_t> converterWUTF8;
+
+		return converterWUTF8.to_bytes(character);*/
+
+		std::mbstate_t mb = std::mbstate_t();
+		auto& f = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(locale);
+		const wchar_t* from_next;
+		char* to_next;
+		Character tmp;
+		f.out(mb, character, &character[2], from_next,
+				  tmp.byte, &tmp.byte[4], to_next);
 
 		return tmp;
 	}

@@ -37,12 +37,14 @@ namespace U8
 			void assign(const char* character);
 			void assign(const Character& character);
 
+			UnicodeData::GeneralCategory category() const;
 			uint32_t code_point() const;
+			unsigned char combining_class() const;
 			int compare(const Character& character, const std::locale& locale = std::locale()) const;
 
-			static Character fromUTF16(const char16_t character[2]);
-			static Character fromUTF32(const char32_t character[1]);
-			static Character fromWide(const wchar_t* character, const std::locale& locale = std::locale());
+			UnicodeData::BidirectionalCategory direction() const;
+
+			bool has_mirrored() const;
 
 			bool isalnum(const std::locale& locale = std::locale()) const;
 			bool isalpha(const std::locale& locale = std::locale()) const;
@@ -62,14 +64,19 @@ namespace U8
 			Character& operator=(char character);
 			Character& operator=(const char* character);
 			Character& operator=(const Character& character);
-			Character& operator=(Character&& character) = default;
+			Character& operator=(Character&& character);
 
 			operator std::basic_string<char> () const;
 
 			Character tolower(const std::locale& locale = std::locale()) const;
+			Character totitlecase(const std::locale& locale = std::locale()) const;
 			Character toupper(const std::locale& locale = std::locale()) const;
 
 			friend std::istream& operator>>(std::istream& is, Character& character);
+
+			static Character fromUTF16(const char16_t character[2]);
+			static Character fromUTF32(const char32_t character[1]);
+			static Character fromWide(const wchar_t* character, const std::locale& locale = std::locale());
 
 		private:
 

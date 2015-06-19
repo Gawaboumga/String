@@ -31,7 +31,6 @@ SCENARIO("Character", "[CORE]")
 
 				{
 					Character charUTF8(u8"a");
-					// Because locale works perfectly as I want !
 					charUTF8 = charUTF8.toupper(std::locale("en_US.utf8"));
 					CHECK(charUTF8 == u8"A");
 					CHECK(charUTF8 == "A");
@@ -124,6 +123,24 @@ SCENARIO("Character", "[CORE]")
 				REQUIRE(Gclef == Character::fromUTF16(u"\U0001D11E"));
 				REQUIRE(Gclef == Character::fromUTF32(U"\U0001D11E"));
 				//REQUIRE(Gclef == Character::fromWide(L"\U0001D11E"));
+
+			}
+
+		}
+
+		WHEN("We ask for character information")
+		{
+
+			THEN("Unicode defines these properties")
+			{
+
+				Character e(u8"é");
+				REQUIRE(e.category() == UnicodeData::GeneralCategory::Ll);
+				REQUIRE(e.combining_class() == 0);
+				REQUIRE(e.direction() == UnicodeData::BidirectionalCategory::L);
+				REQUIRE(e.has_mirrored() == false);
+				REQUIRE(e.totitlecase() == u8"É");
+				REQUIRE(e.toupper() == u8"É");
 
 			}
 
