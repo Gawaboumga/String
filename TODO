@@ -1,0 +1,6 @@
+- Find_last, ...
+- Multi character mapping upper/lower
+- Allocator
+- Regex
+- Capacity -> convert to pointer ?
+- SharedString -> convert to shared_ptr ?
