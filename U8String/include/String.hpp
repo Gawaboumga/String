@@ -213,8 +213,8 @@ namespace U8
 			};
 
 			void ensure_ownership();
-			char* get_index(size_type pos);
-			char* raw_buffer();
+			pointer get_index(size_type pos);
+			pointer raw_buffer();
 			void release_string();
 			void right_shift(size_type pos, size_type length, size_type end);
 

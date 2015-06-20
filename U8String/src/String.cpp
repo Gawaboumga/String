@@ -65,7 +65,7 @@ namespace U8
 
 	String::StringIterator::operator const char* () const
 	{
-		const char* ptr = m_string->data();
+		const_pointer ptr = m_string->data();
 		utf8::advance(ptr, m_pos, m_string->data() + m_string->capacity());
 		return ptr;
 	}
@@ -333,7 +333,7 @@ namespace U8
 
 	void String::assign(const_iterator first, const_iterator last)
 	{
-		assign(static_cast<const char*>(first), static_cast<const char*>(last));
+		assign(static_cast<const_pointer>(first), static_cast<const_pointer>(last));
 	}
 
 	void String::assign(std::initializer_list<const char*> init)
@@ -428,11 +428,7 @@ namespace U8
 	{
 		utf8::iterator<const char*> it(data(), data(), data() + capacity());
 
-		while (pos > 0)
-		{
-			++it;
-			--pos;
-		}
+		std::advance(it, pos);
 
 		return *it;
 	}
@@ -484,8 +480,8 @@ namespace U8
 		auto lengthBeginning = begin().number_character(first);
 		auto length = first.number_character(last);
 
-		char* firstTmp = const_cast<char*>(static_cast<const char*>(first));
-		char* lastTmp = const_cast<char*>(static_cast<const char*>(last));
+		pointer firstTmp = const_cast<pointer>(static_cast<const_pointer>(first));
+		pointer lastTmp = const_cast<pointer>(static_cast<const_pointer>(last));
 		std::rotate(firstTmp, lastTmp, &raw_buffer()[capacity()]);
 
 		m_sharedString->buffer[capacity() - 1] = '\0';
@@ -727,11 +723,7 @@ namespace U8
 	{
 		utf8::iterator<const char*> it(data(), data(), data() + capacity());
 
-		while (pos > 0)
-		{
-			++it;
-			--pos;
-		}
+		std::advance(it, pos);
 
 		auto tmp = it;
 		++it;
@@ -772,7 +764,7 @@ namespace U8
 		auto it = begin();
 		std::advance(it, pos);
 
-		char* tmp = const_cast<char*>(static_cast<const char*>(it));
+		pointer tmp = const_cast<pointer>(static_cast<const_pointer>(it));
 		++it;
 
 		size_type diff = it - tmp;
@@ -785,22 +777,18 @@ namespace U8
 		}
 		else if (diff < count * character.number_byte()) // We must make it bigger.
 		{
-			/*for(auto i = 0; i != capacity(); ++i)
-				printf("%02x ", m_sharedString->buffer[i]);
-			printf("\n");*/
-
 			auto offset = tmp - data();
 
 			reserve(capacity() + count * character.number_byte() - diff); // New buffer allowed => iterators invalidate.
 			m_sharedString->buffer[capacity() - 1] = '\0';
 
-			char* newTmp = raw_buffer() + offset;
+			pointer newTmp = raw_buffer() + offset;
 
 			// We make a right shift !
-			char* beginBuffer = newTmp + (count * character.number_byte() - diff);
-			char* endBuffer = &m_sharedString->buffer[capacity() - 2];
+			pointer beginBuffer = newTmp + (count * character.number_byte() - diff);
+			pointer endBuffer = &m_sharedString->buffer[capacity() - 2];
 
-			for (char* i = endBuffer; i != beginBuffer; --i)
+			for (pointer i = endBuffer; i != beginBuffer; --i)
 				*i = *(i - count * character.number_byte() + diff);
 
 			for (auto i = 0U; i < count * character.number_byte(); ++i)
@@ -871,13 +859,13 @@ namespace U8
 			m_sharedString->refCount--;
 
 			pointer newBuffer = new value_type[capacity()];
-			std::copy(static_cast<const char*>(begin()), static_cast<const char*>(end()), newBuffer);
+			std::copy(static_cast<const_pointer>(begin()), static_cast<const_pointer>(end()), newBuffer);
 
 			m_sharedString = new SharedString(1, capacity(), size(), newBuffer);
 		}
 	}
 
-	char* String::raw_buffer()
+	String::pointer String::raw_buffer()
 	{
 		return m_sharedString->buffer;
 	}
@@ -898,10 +886,10 @@ namespace U8
 
 	void String::right_shift(size_type pos, size_type length, size_type endBuf)
 	{
-		char* beginBuffer = raw_buffer() + pos + length - 1;
-		char* endBuffer = raw_buffer() + endBuf - 1;
+		pointer beginBuffer = raw_buffer() + pos + length - 1;
+		pointer endBuffer = raw_buffer() + endBuf - 1;
 
-		for (char* i = endBuffer; i != beginBuffer; --i)
+		for (pointer i = endBuffer; i != beginBuffer; --i)
 			*i = *(i - length);
 	}
 

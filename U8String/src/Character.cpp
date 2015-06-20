@@ -65,12 +65,6 @@ namespace U8
 	void Character::assign(const Character& character)
 	{
 		std::copy(character.byte, character.byte + character.number_byte(), byte);
-		/*size_type i = 0;
-		while (i < character.number_byte())
-		{
-			byte[i] = character[i];
-			++i;
-		}*/
 	}
 
 	UnicodeData::GeneralCategory Character::category() const
