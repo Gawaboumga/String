@@ -64,12 +64,13 @@ namespace U8
 
 	void Character::assign(const Character& character)
 	{
-		size_type i = 0;
+		std::copy(character.byte, character.byte + character.number_byte(), byte);
+		/*size_type i = 0;
 		while (i < character.number_byte())
 		{
 			byte[i] = character[i];
 			++i;
-		}
+		}*/
 	}
 
 	UnicodeData::GeneralCategory Character::category() const
@@ -216,12 +217,12 @@ namespace U8
 
 	Character& Character::operator=(Character&& character)
 	{
-		if (m_string)
-			m_string->replace(m_position, 1, character);
+		std::move(character.byte, character.byte + 4, byte);
 
-		std::copy(character.byte, character.byte + 4, byte);
-		m_position = character.m_position;
-		m_string = character.m_string;
+		if (m_string)
+			m_string->replace(m_position, 1, *this);
+
+		return *this;
 	}
 
 	Character::operator std::basic_string<char> () const

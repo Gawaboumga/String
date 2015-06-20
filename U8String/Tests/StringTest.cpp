@@ -732,12 +732,17 @@ SCENARIO("String", "[CORE]")
 
 				REQUIRE(std::count(randomString.begin(), randomString.end(), u8"à") == 2);
 
-				std::cout << randomString << " " << randomString.size() << std::endl;
-				randomString.erase(std::remove_if(randomString.begin(), randomString.end(),	[](Character x) {
-					return x == u8"o";
+				randomString.erase(std::remove_if(randomString.begin(), randomString.end(), [](const Character& x) {
+					return x == 'o';
 				}), randomString.end());
 
 				REQUIRE(randomString == u8"hell wrld à tus et à tutes");
+
+				randomString.erase(std::remove_if(randomString.begin(), randomString.end(), [](const Character& x) {
+					return x == u8"à";
+				}), randomString.end());
+
+				REQUIRE(randomString == u8"hell wrld  tus et  tutes");
 
 			}
 

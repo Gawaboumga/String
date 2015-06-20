@@ -11,17 +11,10 @@ namespace U8
 	String::StringIterator::StringIterator(const String* string, size_type pos) :
 		m_pos(pos), m_string(string)
 	{
-		m_ptr = utf8::iterator<char*>(const_cast<char*>(string->data()), const_cast<char*>(string->data()), const_cast<char*>(string->data() + string->capacity()));
-		std::advance(m_ptr, pos);
 	}
 
 	String::StringIterator::~StringIterator()
 	{
-	}
-
-	const int* String::StringIterator::base() const
-	{
-		return reinterpret_cast<const int*>(static_cast<const char*>(m_ptr.base()));
 	}
 
 	String::StringIterator::difference_type String::StringIterator::number_character(const StringIterator& rhs) const
@@ -34,7 +27,6 @@ namespace U8
 
 	String::StringIterator& String::StringIterator::operator++()
 	{
-		++m_ptr;
 		++m_pos;
 
 		return *this;
@@ -49,8 +41,6 @@ namespace U8
 
 	String::StringIterator& String::StringIterator::operator--()
 	{
-		if (m_pos > 0)
-			--m_ptr;
 		--m_pos;
 
 		return *this;
@@ -73,14 +63,16 @@ namespace U8
 		return { m_pos, m_string };
 	}
 
-	String::StringIterator::operator char* () const
+	String::StringIterator::operator const char* () const
 	{
-		return m_ptr.base();
+		const char* ptr = m_string->data();
+		utf8::advance(ptr, m_pos, m_string->data() + m_string->capacity());
+		return ptr;
 	}
 
 	bool String::StringIterator::operator==(const StringIterator& rhs) const
 	{
-		return m_ptr.base() == rhs.m_ptr.base();
+		return m_pos == rhs.m_pos && m_string == rhs.m_string;
 	}
 
 	bool String::StringIterator::operator!=(const StringIterator& rhs) const
@@ -114,11 +106,11 @@ namespace U8
 	}
 	String::reverse_iterator String::rend()
 	{
-		return StringIterator(this, 0);
+		return StringIterator(this, -1);
 	}
 	String::const_reverse_iterator String::rend() const
 	{
-		return StringIterator(this, 0);
+		return StringIterator(this, -1);
 	}
 	String::const_iterator String::cbegin() const
 	{
@@ -306,9 +298,9 @@ namespace U8
 		if (count > 0)
 		{
 			if (count == npos)
-				assign(static_cast<pointer>(StringIterator(&string, pos)), static_cast<pointer>(StringIterator(&string, string.size())));
+				assign(StringIterator(&string, pos), StringIterator(&string, string.size()));
 			else
-				assign(static_cast<pointer>(StringIterator(&string, pos)), static_cast<pointer>(StringIterator(&string, pos + count)));
+				assign(StringIterator(&string, pos), StringIterator(&string, pos + count));
 		}
 		else
 			release_string();
@@ -337,6 +329,11 @@ namespace U8
 			assign(string, string + sizeString);
 		else
 			release_string();
+	}
+
+	void String::assign(const_iterator first, const_iterator last)
+	{
+		assign(static_cast<const char*>(first), static_cast<const char*>(last));
 	}
 
 	void String::assign(std::initializer_list<const char*> init)
@@ -484,18 +481,17 @@ namespace U8
 
 	String::iterator String::erase(const_iterator first, const_iterator last)
 	{
-		auto lengthBeggining = begin().number_character(first);
+		auto lengthBeginning = begin().number_character(first);
 		auto length = first.number_character(last);
 
-		char* beginPosition = first;
-		char* endPosition = last;
-
-		std::rotate(beginPosition, endPosition, &raw_buffer()[capacity()]);
+		char* firstTmp = const_cast<char*>(static_cast<const char*>(first));
+		char* lastTmp = const_cast<char*>(static_cast<const char*>(last));
+		std::rotate(firstTmp, lastTmp, &raw_buffer()[capacity()]);
 
 		m_sharedString->buffer[capacity() - 1] = '\0';
 		m_sharedString->size -= length;
 
-		return StringIterator(this, lengthBeggining);
+		return StringIterator(this, lengthBeginning);
 	}
 
 	String::size_type String::find(const String& str, size_type pos) const
@@ -776,7 +772,7 @@ namespace U8
 		auto it = begin();
 		std::advance(it, pos);
 
-		auto tmp = it;
+		char* tmp = const_cast<char*>(static_cast<const char*>(it));
 		++it;
 
 		size_type diff = it - tmp;
@@ -875,7 +871,7 @@ namespace U8
 			m_sharedString->refCount--;
 
 			pointer newBuffer = new value_type[capacity()];
-			std::copy(begin().base(), end().base(), newBuffer);
+			std::copy(static_cast<const char*>(begin()), static_cast<const char*>(end()), newBuffer);
 
 			m_sharedString = new SharedString(1, capacity(), size(), newBuffer);
 		}

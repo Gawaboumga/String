@@ -41,13 +41,11 @@ namespace U8
 					StringIterator(const String* string, size_type pos);
 					~StringIterator();
 
-					const int* base() const;
-
 					difference_type number_character(const StringIterator& rhs) const;
 
 					Character operator*();
 					const Character operator*() const;
-					operator char*() const;
+					operator const char* () const;
 					StringIterator& operator=(const StringIterator& other) = default;
 
 					bool operator==(const StringIterator& rhs) const;
@@ -60,7 +58,6 @@ namespace U8
 
 				private:
 
-					utf8::iterator<char*> m_ptr;
 					size_type m_pos;
 					const String* m_string;
 			};
@@ -114,6 +111,7 @@ namespace U8
 			void assign(String&& string);
 			void assign(const char* string, size_type count);
 			void assign(const char* string);
+			void assign(const_iterator first, const_iterator last);
 			template <typename RandomIter, typename = RequireRandomIter<RandomIter>>
 			void assign(RandomIter first, RandomIter last);
 			void assign(std::initializer_list<const char*> init);

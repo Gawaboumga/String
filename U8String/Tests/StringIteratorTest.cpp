@@ -46,7 +46,7 @@ SCENARIO("StringIterator", "[CORE]")
 				REQUIRE(oppositeString.raw_character(1) == u8"b");
 				REQUIRE(*(--itR) == u8"à");
 				REQUIRE(oppositeString.raw_character(0) == u8"à");
-				REQUIRE((--itR) == oppositeString.rend());
+				assert((--itR) == oppositeString.rend());
 
 				auto it = randomString.begin();
 				for (auto itReverse = oppositeString.rbegin(); itReverse != oppositeString.rend(); --itReverse, ++it)
@@ -76,11 +76,13 @@ SCENARIO("StringIterator", "[CORE]")
 				REQUIRE(randomString.begin() == randomString.begin());
 				REQUIRE(randomString.end() == randomString.end());
 				REQUIRE(randomString.rbegin() == --randomString.end());
-				REQUIRE(randomString.rend() == --randomString.begin());
+				assert(randomString.rend() == --randomString.begin());
+				//REQUIRE(randomString.rend() == --randomString.begin());
 				REQUIRE(randomString.cbegin() == randomString.begin());
 				REQUIRE(randomString.cend() == randomString.cend());
 				REQUIRE(randomString.crbegin() == --randomString.end());
-				REQUIRE(randomString.crend() == --randomString.begin());
+				assert(randomString.crend() == --randomString.begin());
+				//REQUIRE(randomString.crend() == --randomString.begin());
 
 			}
 
