@@ -56,17 +56,28 @@ namespace U8
 					StringIterator& operator--();
 					StringIterator operator--(int);
 
-				private:
+				protected:
 
 					size_type m_pos;
 					const String* m_string;
 			};
 
+			class ReverseStringIterator : public StringIterator
+			{
+				public:
+					using StringIterator::StringIterator;
+
+					ReverseStringIterator& operator++();
+					ReverseStringIterator operator++(int);
+					ReverseStringIterator& operator--();
+					ReverseStringIterator operator--(int);
+			};
+
 			// types:
 			typedef StringIterator iterator;
 			typedef const StringIterator const_iterator;
-			typedef StringIterator reverse_iterator;
-			typedef const StringIterator const_reverse_iterator;
+			typedef ReverseStringIterator reverse_iterator;
+			typedef const ReverseStringIterator const_reverse_iterator;
 
 			// iterators:
 			iterator begin();
@@ -138,7 +149,7 @@ namespace U8
 			iterator erase(const_iterator first, const_iterator last);
 
 			size_type find(const String& str, size_type pos = 0) const;
-			size_type find(const char* string, size_type start = 0) const;
+			size_type find(const char* string, size_type pos = 0) const;
 			size_type find(const Character& character, size_type pos = 0) const;
 			Character front();
 			const Character front() const;
@@ -177,6 +188,9 @@ namespace U8
 			std::basic_string<char> raw_character(size_type pos) const;
 			void reserve(size_type bufferSize = 0);
 			void replace(size_type pos, size_type count, const Character& character);
+			size_type rfind(const String& string, size_type pos = npos) const;
+			size_type rfind(const char* string, size_type pos = npos) const;
+			size_type rfind(const Character& character, size_type pos = npos) const;
 
 			void shrink_to_fit();
 			size_type size() const;

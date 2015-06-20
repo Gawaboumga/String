@@ -80,6 +80,34 @@ namespace U8
 		return !operator==(rhs);
 	}
 
+	String::ReverseStringIterator& String::ReverseStringIterator::operator++()
+	{
+		--m_pos;
+
+		return *this;
+	}
+
+	String::ReverseStringIterator String::ReverseStringIterator::operator++(int /*junk*/)
+	{
+		ReverseStringIterator tmp(*this);
+		operator++();
+		return tmp;
+	}
+
+	String::ReverseStringIterator& String::ReverseStringIterator::operator--()
+	{
+		++m_pos;
+
+		return *this;
+	}
+
+	String::ReverseStringIterator String::ReverseStringIterator::operator--(int /*junk*/)
+	{
+		ReverseStringIterator tmp(*this);
+		operator--();
+		return tmp;
+	}
+
 	String::iterator String::begin()
 	{
 		return StringIterator(this, 0);
@@ -98,19 +126,19 @@ namespace U8
 	}
 	String::reverse_iterator String::rbegin()
 	{
-		return StringIterator(this, size() - 1);
+		return ReverseStringIterator(this, size() - 1);//StringIterator(this, size() - 1);
 	}
 	String::const_reverse_iterator String::rbegin() const
 	{
-		return StringIterator(this, size() - 1);
+		return ReverseStringIterator(this, size() - 1);//StringIterator(this, size() - 1);
 	}
 	String::reverse_iterator String::rend()
 	{
-		return StringIterator(this, -1);
+		return ReverseStringIterator(this, -1);//StringIterator(this, -1);
 	}
 	String::const_reverse_iterator String::rend() const
 	{
-		return StringIterator(this, -1);
+		return ReverseStringIterator(this, -1);//StringIterator(this, -1);
 	}
 	String::const_iterator String::cbegin() const
 	{
@@ -497,35 +525,18 @@ namespace U8
 
 	String::size_type String::find(const char* string, size_type pos) const
 	{
-		auto stringSize = strlen(string);
-		if (stringSize == 0)
-			return empty() == true;
+		if (pos >= size() || string[0] == '\0')
+			return npos;
 
-		auto it = begin();
-		std::advance(it, pos);
+		auto itBegin = begin();
+		std::advance(itBegin, pos);
 
-		auto offset = it - begin();
+		auto tmp = std::search(static_cast<const_pointer>(itBegin), static_cast<const_pointer>(end()), string, string + std::strlen(string));
 
-		for (auto i = offset; data()[i]; ++i)
-		{
-			if (data()[i] == string[0])
-			{
-				auto beginning = i;
-
-				++i;
-				bool canContinue = true;
-				for (auto j = 1U; j < stringSize && canContinue; ++i, ++j)
-					if (data()[i] != string[j])
-						canContinue = false;
-
-				if (canContinue)
-					return utf8::distance(data(), data() + beginning);
-
-				--i;
-			}
-		}
-
-		return npos;
+		if (tmp == end())
+			return npos;
+		else
+			return utf8::distance(static_cast<const_pointer>(begin()), tmp);
 	}
 
 	String::size_type String::find(const Character& character, size_type pos) const
@@ -804,6 +815,50 @@ namespace U8
 				tmp[i] = character.byte[i % character.number_byte()];
 
 			m_sharedString->size += count - 1;
+		}
+	}
+
+	String::size_type String::rfind(const String& string, size_type pos) const
+	{
+		return rfind(string.data(), pos);
+	}
+
+	String::size_type String::rfind(const char* string, size_type pos) const
+	{
+		if (pos != npos && pos >= size())
+			return npos;
+
+		auto itEnd = end();
+		if (pos != npos)
+		{
+			itEnd = begin();
+			std::advance(itEnd, pos);
+		}
+
+		auto tmp = std::find_end(static_cast<const_pointer>(begin()), static_cast<const_pointer>(itEnd), string, string + std::strlen(string));
+
+		if (tmp == itEnd)
+			return npos;
+		else
+			return utf8::distance(static_cast<const_pointer>(begin()), tmp);
+	}
+
+	String::size_type String::rfind(const Character& character, size_type pos) const
+	{
+		auto itBegin = rbegin();
+		if (pos != npos)
+		{
+			std::advance(itBegin, size() - pos);
+		}
+
+		auto tmp = std::find(itBegin, rend(), character);
+
+		if (tmp == rend())
+			return npos;
+		else
+		{
+			auto endSearch = tmp;
+			return utf8::distance(data(), static_cast<const_pointer>(endSearch));
 		}
 	}
 

@@ -588,7 +588,7 @@ SCENARIO("String", "[CORE]")
 		WHEN("We try to find something")
 		{
 
-			THEN("These results are expected")
+			THEN("These results are expected for front to back")
 			{
 
 				auto pos = randomString.find(u8"à");
@@ -598,6 +598,25 @@ SCENARIO("String", "[CORE]")
 
 				pos = randomString.find(String(u8"etc"));
 				REQUIRE(pos == 6);
+
+				pos = randomString.find(Character(u8"à"));
+				REQUIRE(pos == 2);
+
+			}
+
+			AND_THEN("These are for back to front")
+			{
+
+				auto pos = randomString.rfind(u8"à");
+				REQUIRE(pos == 4);
+				pos = randomString.rfind(u8"à", pos - 1);
+				REQUIRE(pos == 2);
+
+				pos = randomString.rfind(String(u8"etc"));
+				REQUIRE(pos == 6);
+
+				pos = randomString.rfind(Character(u8"à"));
+				REQUIRE(pos == 4);
 
 			}
 
@@ -611,6 +630,9 @@ SCENARIO("String", "[CORE]")
 
 				auto it = std::find(randomString.begin(), randomString.end(), u8"à");
 				REQUIRE(it == ++(++randomString.begin()));
+
+				auto rit = std::find(randomString.rbegin(), randomString.rend(), u8"é");
+				REQUIRE(rit == --(--randomString.rend()));
 
 			}
 
@@ -719,12 +741,12 @@ SCENARIO("String", "[CORE]")
 
 	}
 
-	GIVEN("One random string and unsorted string")
+	GIVEN("One random string")
 	{
 
 		String randomString(u8"hello world à tous et à toutes");
 
-		WHEN("We use STL")
+		WHEN("We use STL count and erase/remove_if")
 		{
 
 			THEN("It should behave normally")

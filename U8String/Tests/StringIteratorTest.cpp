@@ -40,16 +40,16 @@ SCENARIO("StringIterator", "[CORE]")
 				auto itR = oppositeString.rbegin();
 				REQUIRE(*itR == u8"a");
 				REQUIRE(oppositeString.raw_character(3) == u8"a");
-				REQUIRE(*(--itR) == u8"é");
+				REQUIRE(*(++itR) == u8"é");
 				REQUIRE(oppositeString.raw_character(2) == u8"é");
-				REQUIRE(*(--itR) == u8"b");
+				REQUIRE(*(++itR) == u8"b");
 				REQUIRE(oppositeString.raw_character(1) == u8"b");
-				REQUIRE(*(--itR) == u8"à");
+				REQUIRE(*(++itR) == u8"à");
 				REQUIRE(oppositeString.raw_character(0) == u8"à");
-				assert((--itR) == oppositeString.rend());
+				assert((++itR) == oppositeString.rend());
 
 				auto it = randomString.begin();
-				for (auto itReverse = oppositeString.rbegin(); itReverse != oppositeString.rend(); --itReverse, ++it)
+				for (auto itReverse = oppositeString.rbegin(); itReverse != oppositeString.rend(); ++itReverse, ++it)
 				{
 					REQUIRE(*it == *itReverse);
 				}
