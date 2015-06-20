@@ -602,6 +602,18 @@ SCENARIO("String", "[CORE]")
 				pos = randomString.find(Character(u8"à"));
 				REQUIRE(pos == 2);
 
+				pos = randomString.find_first_of(String(u8"abcde"));
+				REQUIRE(pos == 6);
+
+				pos = randomString.find_first_not_of(String(u8" éà à "));
+				REQUIRE(pos == 6);
+
+				pos = randomString.find_last_of(String(u8"abcde"), 10);
+				REQUIRE(pos == 8);
+
+				pos = randomString.find_last_not_of(String(u8" ..."));
+				REQUIRE(pos == 8);
+
 			}
 
 			AND_THEN("These are for back to front")

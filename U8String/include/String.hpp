@@ -151,6 +151,14 @@ namespace U8
 			size_type find(const String& str, size_type pos = 0) const;
 			size_type find(const char* string, size_type pos = 0) const;
 			size_type find(const Character& character, size_type pos = 0) const;
+			size_type find_first_of(const String& str, size_type pos = 0) const;
+			size_type find_first_of(const char* string, size_type pos = 0) const;
+			size_type find_first_not_of(const String& str, size_type pos = 0) const;
+			size_type find_first_not_of(const char* string, size_type pos = 0) const;
+			size_type find_last_of(const String& str, size_type pos = npos) const;
+			size_type find_last_of(const char* string, size_type pos = npos) const;
+			size_type find_last_not_of(const String& str, size_type pos = npos) const;
+			size_type find_last_not_of(const char* string, size_type pos = npos) const;
 			Character front();
 			const Character front() const;
 

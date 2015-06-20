@@ -547,6 +547,121 @@ namespace U8
 		return itBegin.number_character(it);
 	}
 
+	String::size_type String::find_first_of(const String& str, size_type pos) const
+	{
+		return find_first_of(str.data(), pos);
+	}
+
+	String::size_type String::find_first_of(const char* string, size_type pos) const
+	{
+		if (pos >= size() || string[0] == '\0')
+			return npos;
+
+		auto itBegin = begin();
+		std::advance(itBegin, pos);
+
+		auto tmp = std::find_first_of(static_cast<const_pointer>(itBegin), static_cast<const_pointer>(end()), string, string + std::strlen(string));
+
+		if (tmp == end())
+			return npos;
+		else
+			return utf8::distance(static_cast<const_pointer>(begin()), tmp);
+	}
+
+	String::size_type String::find_first_not_of(const String& str, size_type pos) const
+	{
+		auto it = begin();
+		std::advance(it, pos);
+		for (; it != end(); ++it)
+		{
+			bool found = false;
+			for (auto itStr = str.begin(); itStr != str.end(); ++itStr) {
+				if (*it == *itStr) {
+					found = true;
+					continue;
+				}
+			}
+
+			if (found == false)
+				return std::distance(begin(), it);
+		}
+
+		return npos;
+	}
+
+	String::size_type String::find_first_not_of(const char* string, size_type pos) const
+	{
+		if (string[0] == '\0')
+			return npos;
+
+		return find_first_not_of(String(string), pos);
+	}
+
+	String::size_type String::find_last_of(const String& str, size_type pos) const
+	{
+		return find_last_of(str.data(), pos);
+	}
+
+	String::size_type String::find_last_of(const char* string, size_type pos) const
+	{
+		if (string[0] == '\0')
+			return npos;
+
+		auto itBegin = rbegin();
+
+		if (pos != npos)
+		{
+			if (pos >= size())
+				return npos;
+
+			std::advance(itBegin, size() - pos - 1);
+		}
+
+		auto tmp = std::find_first_of(itBegin, rend(), string, string + std::strlen(string));
+
+		if (tmp == rend())
+			return npos;
+		else
+			return std::distance(tmp, rend()) - 1;
+	}
+
+	String::size_type String::find_last_not_of(const String& str, size_type pos) const
+	{
+		auto it = rbegin();
+
+		if (pos != npos)
+		{
+			if (pos >= size())
+				return npos;
+
+			std::advance(it, size() - pos - 1);
+		}
+
+		for (; it != rend(); ++it)
+		{
+			bool found = false;
+			for (auto itStr = str.begin(); itStr != str.end(); ++itStr) {
+				if (*it == *itStr) {
+					found = true;
+					continue;
+				}
+			}
+
+			if (found == false)
+				return std::distance(it, rend()) - 1;
+		}
+
+		return npos;
+	}
+
+	String::size_type String::find_last_not_of(const char* string, size_type pos) const
+	{
+		if (string[0] == '\0')
+			return npos;
+
+		return find_last_not_of(String(string), pos);
+	}
+
 	Character String::front()
 	{
 		return { 0, this };
@@ -847,9 +962,7 @@ namespace U8
 	{
 		auto itBegin = rbegin();
 		if (pos != npos)
-		{
 			std::advance(itBegin, size() - pos);
-		}
 
 		auto tmp = std::find(itBegin, rend(), character);
 
