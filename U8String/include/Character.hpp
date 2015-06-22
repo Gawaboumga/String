@@ -74,8 +74,8 @@ namespace U8
 
 			friend std::istream& operator>>(std::istream& is, Character& character);
 
-			static Character fromUTF16(const char16_t character[2]);
-			static Character fromUTF32(const char32_t character[1]);
+			static Character fromUTF16(const char16_t character[3]);
+			static Character fromUTF32(const char32_t character[2]);
 			static Character fromWide(const wchar_t* character, const std::locale& locale = std::locale());
 
 		private:

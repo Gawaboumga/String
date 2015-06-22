@@ -1,7 +1,6 @@
 #include <utf8.h>
 
 #include <cassert>
-#include <iostream>
 
 namespace U8
 {
@@ -40,7 +39,7 @@ namespace U8
 
 		size_type distance = static_cast<size_type>(std::distance(first, last));
 
-		auto offset = pos - data();
+		size_type offset = pos - data();
 
 		if (first >= data() && last <= data() + capacity())
 		{

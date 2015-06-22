@@ -482,6 +482,12 @@ SCENARIO("String", "[CORE]")
 				REQUIRE(emptyString.capacity() >= 8);
 				REQUIRE(emptyString.size() == 6);
 
+				it = --emptyString.end();
+				tmp = emptyString.insert(it, 5, Character(u8"u"));
+				REQUIRE(emptyString.capacity() >= 13);
+				REQUIRE(emptyString.size() == 11);
+				REQUIRE(emptyString == u8"çaé!!uuuuu!");
+
 			}
 
 		}

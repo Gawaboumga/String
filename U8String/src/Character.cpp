@@ -263,7 +263,7 @@ namespace U8
 		return tmp;
 	}
 
-	Character Character::fromUTF16(const char16_t character[2])
+	Character Character::fromUTF16(const char16_t character[3])
 	{
 		Character tmp;
 		char* end = utf8::utf16to8(character, character + (character[1] ? 2 : 1), tmp.byte);
@@ -273,7 +273,7 @@ namespace U8
 		return tmp;
 	}
 
-	Character Character::fromUTF32(const char32_t character[1])
+	Character Character::fromUTF32(const char32_t character[2])
 	{
 		Character tmp;
 		char* end = utf8::utf32to8(character, character + 1, tmp.byte);

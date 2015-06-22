@@ -235,8 +235,8 @@ namespace U8
 			};
 
 			void ensure_ownership();
-			pointer get_index(size_type pos);
 			pointer raw_buffer();
+			size_type raw_size() const;
 			void release_string();
 			void right_shift(size_type pos, size_type length, size_type end);
 

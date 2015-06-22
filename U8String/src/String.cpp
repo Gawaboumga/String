@@ -275,7 +275,7 @@ namespace U8
 
 	void String::assign(size_type n, char character)
 	{
-		if (n > 0U)
+		if (n > 0 && character != '\0')
 		{
 			ensure_ownership();
 
@@ -285,7 +285,7 @@ namespace U8
 			m_sharedString->size = n;
 
 			std::fill(raw_buffer(), raw_buffer() + n, character);
-			m_sharedString->buffer[n] = 0; // String is terminated by a '\0'.
+			m_sharedString->buffer[n] = '\0'; // String is terminated by a '\0'.
 		}
 		else
 			release_string();
@@ -293,7 +293,7 @@ namespace U8
 
 	void String::assign(size_type n, const Character& character)
 	{
-		if (n > 0)
+		if (n > 0 && character != '\0')
 		{
 			ensure_ownership();
 
@@ -305,8 +305,8 @@ namespace U8
 			auto tmp = std::basic_string<char>(character);
 			for (auto i = 0U; i != n * character.number_byte(); ++i)
 				raw_buffer()[i] = tmp[i % character.number_byte()];
-			//std::fill(raw_buffer(), raw_buffer() + n * character.number_byte(), character);
-			m_sharedString->buffer[n * character.number_byte()] = 0; // String is terminated by a '\0'.
+
+			m_sharedString->buffer[n * character.number_byte()] = '\0'; // String is terminated by a '\0'.
 		}
 		else
 			release_string();
@@ -820,18 +820,21 @@ namespace U8
 	String& String::operator+=(const char* other)
 	{
 		append(other);
+
 		return *this;
 	}
 
 	String& String::operator+=(const String& other)
 	{
 		append(other);
+
 		return *this;
 	}
 
 	String& String::operator+=(const Character& other)
 	{
 		append(other);
+
 		return *this;
 	}
 
@@ -964,14 +967,13 @@ namespace U8
 		if (pos != npos)
 			std::advance(itBegin, size() - pos);
 
-		auto tmp = std::find(itBegin, rend(), character);
+		auto it = std::find(itBegin, rend(), character);
 
-		if (tmp == rend())
+		if (it == rend())
 			return npos;
 		else
 		{
-			auto endSearch = tmp;
-			return utf8::distance(data(), static_cast<const_pointer>(endSearch));
+			return utf8::distance(data(), static_cast<const_pointer>(it));
 		}
 	}
 
@@ -1038,6 +1040,11 @@ namespace U8
 		return m_sharedString->buffer;
 	}
 
+	String::size_type String::raw_size() const
+	{
+		return std::strlen(data());
+	}
+
 	void String::release_string()
 	{
 		if (m_sharedString == &emptyString)
@@ -1066,8 +1073,8 @@ namespace U8
 
 	String operator+(const String& lhs, const String& rhs)
 	{
-		auto firstSize = std::strlen(lhs.data());
-		auto secondSize = std::strlen(rhs.data());
+		auto firstSize = lhs.raw_size();
+		auto secondSize = rhs.raw_size();
 		String::pointer newBuffer = new String::value_type[firstSize + secondSize + 1];
 		std::copy(lhs.data(), lhs.data() + firstSize, newBuffer);
 		std::copy(rhs.data(), rhs.data() + secondSize, newBuffer + firstSize);
