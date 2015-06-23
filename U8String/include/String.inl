@@ -1,6 +1,7 @@
 #include <utf8.h>
 
 #include <cassert>
+#include <iostream>
 
 namespace U8
 {

@@ -140,6 +140,7 @@ namespace U8
 			void clear(bool keepBuffer = true);
 			uint32_t code_point(size_type pos) const;
 			int compare(const String& other, const std::locale& locale = std::locale()) const;
+			size_type copy(char* dest, size_type count, size_type pos = 0) const;
 
 			const char* data() const;
 
@@ -195,6 +196,7 @@ namespace U8
 
 			std::basic_string<char> raw_character(size_type pos) const;
 			void reserve(size_type bufferSize = 0);
+			void resize(size_type count, const Character& character = Character());
 			void replace(size_type pos, size_type count, const Character& character);
 			size_type rfind(const String& string, size_type pos = npos) const;
 			size_type rfind(const char* string, size_type pos = npos) const;

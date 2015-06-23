@@ -20,6 +20,7 @@ SCENARIO("String", "[CORE]")
 
 				{
 					String emptyString;
+					REQUIRE(emptyString.empty());
 					REQUIRE(emptyString.capacity() == 0);
 					REQUIRE(emptyString.size() == 0);
 				}
@@ -28,36 +29,42 @@ SCENARIO("String", "[CORE]")
 					String sizeTwoCapacityFour(u8"éà");
 					REQUIRE(sizeTwoCapacityFour.capacity() >= 4);
 					REQUIRE(sizeTwoCapacityFour.size() == 2);
+					REQUIRE(sizeTwoCapacityFour == u8"éà");
 				}
 
 				{
 					String oneChar('a');
 					REQUIRE(oneChar.capacity() >= 1);
 					REQUIRE(oneChar.size() == 1);
+					REQUIRE(oneChar == u8"a");
 				}
 
 				{
 					String oneChar(Character(u8"à"));
 					REQUIRE(oneChar.capacity() >= 2);
 					REQUIRE(oneChar.size() == 1);
+					REQUIRE(oneChar == u8"à");
 				}
 
 				{
-					String oneChar(3, 'a');
-					REQUIRE(oneChar.capacity() >= 3);
-					REQUIRE(oneChar.size() == 3);
+					String threeChar(3, 'a');
+					REQUIRE(threeChar.capacity() >= 3);
+					REQUIRE(threeChar.size() == 3);
+					REQUIRE(threeChar == u8"aaa");
 				}
 
 				{
-					String oneChar(3, Character(u8"à"));
-					REQUIRE(oneChar.capacity() >= 6);
-					REQUIRE(oneChar.size() == 3);
+					String threeChar(3, Character(u8"à"));
+					REQUIRE(threeChar.capacity() >= 6);
+					REQUIRE(threeChar.size() == 3);
+					REQUIRE(threeChar == u8"ààà");
 				}
 
 				{
 					String sizeThreeCapacityFour(u8"Téste", 1, 3);
 					REQUIRE(sizeThreeCapacityFour.capacity() >= 4);
 					REQUIRE(sizeThreeCapacityFour.size() == 3);
+					REQUIRE(sizeThreeCapacityFour == u8"ést");
 				}
 
 
@@ -65,18 +72,21 @@ SCENARIO("String", "[CORE]")
 					String sizeThreeCapacityFour(u8"Tést", 1, String::npos);
 					REQUIRE(sizeThreeCapacityFour.capacity() >= 4);
 					REQUIRE(sizeThreeCapacityFour.size() == 3);
+					REQUIRE(sizeThreeCapacityFour == u8"ést");
 				}
 
 				{
 					String sizeFourCapacityFour("Test");
 					REQUIRE(sizeFourCapacityFour.capacity() >= 4);
 					REQUIRE(sizeFourCapacityFour.size() == 4);
+					REQUIRE(sizeFourCapacityFour == u8"Test");
 				}
 
 				{
 					String sizeThreeCapacityFour("Tça");
 					REQUIRE(sizeThreeCapacityFour.capacity() >= 4);
 					REQUIRE(sizeThreeCapacityFour.size() == 3);
+					REQUIRE(sizeThreeCapacityFour == u8"Tça");
 				}
 
 				{
@@ -84,18 +94,21 @@ SCENARIO("String", "[CORE]")
 					String sizeThreeCapacityThree(tmp.begin(), tmp.end());
 					REQUIRE(sizeThreeCapacityThree.capacity() >= 3);
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
+					REQUIRE(sizeThreeCapacityThree == u8"abc");
 				}
 
 				{
 					String sizeThreeCapacityThree(std::string("abc"));
 					REQUIRE(sizeThreeCapacityThree.capacity() >= 3);
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
+					REQUIRE(sizeThreeCapacityThree == u8"abc");
 				}
 
 				{
 					String sizeFourCapacityFive(String(u8"aébc"));
 					REQUIRE(sizeFourCapacityFive.capacity() >= 5);
 					REQUIRE(sizeFourCapacityFive.size() == 4);
+					REQUIRE(sizeFourCapacityFive == u8"aébc");
 				}
 
 				{
@@ -103,6 +116,7 @@ SCENARIO("String", "[CORE]")
 					String sizeFourCapacityFive(std::move(tmp));
 					REQUIRE(sizeFourCapacityFive.capacity() >= 5);
 					REQUIRE(sizeFourCapacityFive.size() == 4);
+					REQUIRE(sizeFourCapacityFive == u8"aébc");
 					REQUIRE(tmp.capacity() == 0);
 					REQUIRE(tmp.size() == 0);
 				}
@@ -111,12 +125,14 @@ SCENARIO("String", "[CORE]")
 					String sizeThreeCapacityThree({'a', 'b', 'c'});
 					REQUIRE(sizeThreeCapacityThree.capacity() >= 3);
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
+					REQUIRE(sizeThreeCapacityThree == u8"abc");
 				}
 
 				{
 					String sizeThreeCapacityThree({u8"à", u8"b", u8"c"});
 					REQUIRE(sizeThreeCapacityThree.capacity() >= 4);
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
+					REQUIRE(sizeThreeCapacityThree == u8"àbc");
 				}
 
 			}
@@ -392,7 +408,11 @@ SCENARIO("String", "[CORE]")
 			{
 
 				REQUIRE(abe.front() == u8"à");
+				abe.front() = u8"b";
+				REQUIRE(abe == u8"bbé");
 				REQUIRE(abe.back() == u8"é");
+				abe.back() = u8"t";
+				REQUIRE(abe == u8"bbt");
 
 			}
 
@@ -423,6 +443,16 @@ SCENARIO("String", "[CORE]")
 				REQUIRE(abe == "");
 				REQUIRE(abe.capacity() == 0);
 				REQUIRE(abe.size() == 0);
+
+			}
+
+			THEN("We resize (5) and (3), we come back to origin")
+			{
+
+				abe.resize(5, Character('a'));
+				REQUIRE(abe == u8"àbéaa");
+				abe.resize(3);
+				REQUIRE(abe == u8"àbé");
 
 			}
 
@@ -537,6 +567,25 @@ SCENARIO("String", "[CORE]")
 				REQUIRE(it == --randomString.end());
 				REQUIRE(randomString == u8"ht");
 				REQUIRE(randomString.size() == 2);
+
+			}
+
+			THEN("With mixed")
+			{
+
+				String str(u8"This is an example sentence.");
+				str.erase(10, 8);
+				REQUIRE(str == u8"This is an sentence.");
+				auto it = str.begin();
+				std::advance(it, 9);
+				str.erase(it);
+				REQUIRE(str == u8"This is a sentence.");
+				auto itFirst = str.begin();
+				auto itEnd = str.begin();
+				std::advance(itFirst, 5);
+				std::advance(itEnd, str.size() - 9);
+				str.erase(itFirst, itEnd);
+				REQUIRE(str == u8"This sentence.");
 
 			}
 
@@ -787,6 +836,20 @@ SCENARIO("String", "[CORE]")
 			}
 
 		}
+
+	}
+
+	GIVEN("One string")
+	{
+
+		String foo(u8"quùùux");
+		char bar[9] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'};
+		foo.copy(bar, sizeof(bar));
+		REQUIRE(bar[7] == 'x');
+		REQUIRE(bar[8] == 'i');
+		bar[8] = '\0';
+		String tmp(bar);
+		REQUIRE(tmp == u8"quùùux");
 
 	}
 

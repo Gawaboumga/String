@@ -323,12 +323,15 @@ namespace U8
 
 	void String::assign(const String& string, size_type pos, size_type count)
 	{
+		if (pos > string.size())
+			throw std::out_of_range("Index out of range (" + std::to_string(pos) + " >= " + std::to_string(string.size()) + ')');
+
 		if (count > 0)
 		{
 			if (count == npos)
 				assign(StringIterator(&string, pos), StringIterator(&string, string.size()));
 			else
-				assign(StringIterator(&string, pos), StringIterator(&string, pos + count));
+				assign(StringIterator(&string, pos), StringIterator(&string, std::min(string.size(), pos + count)));
 		}
 		else
 			release_string();
@@ -469,6 +472,29 @@ namespace U8
 			s2.data(), s2.data() + s2.size());
 	}
 
+	String::size_type String::copy(char* dest, size_type count, size_type pos) const
+	{
+		if (pos >= size())
+			throw std::out_of_range("Index out of range (" + std::to_string(pos) + " >= " + std::to_string(size()) + ')');
+
+		auto it = begin();
+		std::advance(it, pos);
+
+		const char* end = nullptr;
+		if (count < size())
+		{
+			auto tmp = it;
+			std::advance(tmp, count);
+			end = tmp;
+		}
+		else
+			end = data() + capacity();
+
+		std::copy(static_cast<const_pointer>(it), end - 1, dest);
+
+		return std::min(count, size());
+	}
+
 	void String::clear(bool keepBuffer)
 	{
 		if (keepBuffer)
@@ -492,7 +518,7 @@ namespace U8
 
 	String& String::erase(size_type index, size_type count)
 	{
-		erase(StringIterator(this, index), StringIterator(this, std::min(index + std::min(count, size()), size())));
+		erase(StringIterator(this, index), StringIterator(this, index + std::min(count, size() - index)));
 
 		return *this;
 	}
@@ -883,6 +909,14 @@ namespace U8
 		m_sharedString->buffer = newBuffer;
 		m_sharedString->capacity = bufferSize;
 		m_sharedString->size = oldSize;
+	}
+
+	void String::resize(size_type count, const Character& character)
+	{
+		if (size() < count)
+			insert(size(), count - size(), character);
+		else
+			m_sharedString->size = count;
 	}
 
 	void String::replace(size_type pos, size_type count, const Character& character)
