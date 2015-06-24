@@ -5,3 +5,4 @@
 - Regex
 - Capacity -> convert to pointer ?
 - SharedString -> convert to shared_ptr ?
+- Do a real presentation of the project

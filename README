@@ -1,4 +1,0 @@
-Library to handle utf-8 strings in c++
-
-#To test in the directory "U8String"
-mkdir build && cd build && cmake .. && make && ./test
