@@ -1,6 +1,7 @@
 #include <catch.hpp>
 #include <String.hpp>
 
+#include <forward_list>
 #include <regex>
 
 SCENARIO("String", "[CORE]")
@@ -98,6 +99,14 @@ SCENARIO("String", "[CORE]")
 				}
 
 				{
+					std::forward_list<Character> flist{ u8"é", u8"t", u8"à" };
+					String sizeThreeCapacityFive(flist.begin(), flist.end());
+					REQUIRE(sizeThreeCapacityFive.capacity() >= 5);
+					REQUIRE(sizeThreeCapacityFive.size() == 3);
+					REQUIRE(sizeThreeCapacityFive == u8"étà");
+				}
+
+				{
 					String sizeThreeCapacityThree(std::string("abc"));
 					REQUIRE(sizeThreeCapacityThree.capacity() >= 3);
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
@@ -188,6 +197,12 @@ SCENARIO("String", "[CORE]")
 				emptyString = {u8"ç", u8"à", u8"v", u8"a"};
 				REQUIRE(emptyString.capacity() >= 6);
 				REQUIRE(emptyString.size() == 4);
+
+				emptyString = u8"étà";
+				emptyString.assign(emptyString.begin(), emptyString.end());
+				REQUIRE(emptyString.capacity() >= 5);
+				REQUIRE(emptyString.size() == 3);
+				REQUIRE(emptyString == u8"étà");
 
 			}
 
@@ -517,6 +532,12 @@ SCENARIO("String", "[CORE]")
 				REQUIRE(emptyString.capacity() >= 13);
 				REQUIRE(emptyString.size() == 11);
 				REQUIRE(emptyString == u8"çaé!!uuuuu!");
+
+				std::forward_list<Character> flist({ u8"b", "ô" });
+				emptyString.insert(--emptyString.end(), flist.begin(), flist.end());
+				REQUIRE(emptyString.capacity() >= 16);
+				REQUIRE(emptyString.size() == 13);
+				REQUIRE(emptyString == u8"çaé!!uuuuubô!");
 
 			}
 

@@ -5,16 +5,33 @@
 
 namespace U8
 {
-	template <typename RandomIter, typename>
-	String::String(RandomIter first, RandomIter last) :
+	template <typename InputIter, typename>
+	String::String(InputIter first, InputIter last) :
 	m_sharedString(&emptyString)
 	{
 		if (first != last)
 			assign(first, last);
 	}
 
-	template <typename RandomIter, typename>
-	void String::assign(RandomIter first, RandomIter last)
+	template <typename InputIter, typename>
+	void String::assign(InputIter first, InputIter last)
+	{
+		return assign(first, last, typename std::iterator_traits<InputIter>::iterator_category());
+	}
+
+	template <typename InputIter>
+	void String::assign(InputIter first, InputIter last, std::input_iterator_tag)
+	{
+		ensure_ownership();
+
+		clear(true);
+
+		for (; first != last; ++first)
+			push_back(*first);
+	}
+
+	template <typename RandomIter>
+	void String::assign(RandomIter first, RandomIter last, std::random_access_iterator_tag)
 	{
 		assert(first < last);
 
@@ -31,8 +48,27 @@ namespace U8
 		m_sharedString->size = utf8::distance(first, last);
 	}
 
-	template <typename RandomIter, typename>
-	String::iterator String::insert(const_iterator pos, RandomIter first, RandomIter last)
+	template <typename InputIter, typename>
+	String::iterator String::insert(const_iterator pos, InputIter first, InputIter last)
+	{
+		return insert(pos, first, last, typename std::iterator_traits<InputIter>::iterator_category());
+	}
+
+	template <typename InputIter>
+	String::iterator String::insert(const_iterator pos, InputIter first, InputIter last, std::input_iterator_tag)
+	{
+		ensure_ownership();
+
+		auto it = pos;
+
+		for (; first != last; ++first)
+			insert(it++, *first);
+
+		return pos;
+	}
+
+	template <typename RandomIter>
+	String::iterator String::insert(const_iterator pos, RandomIter first, RandomIter last, std::random_access_iterator_tag)
 	{
 		assert(first < last);
 

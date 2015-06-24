@@ -126,19 +126,19 @@ namespace U8
 	}
 	String::reverse_iterator String::rbegin()
 	{
-		return ReverseStringIterator(this, size() - 1);//StringIterator(this, size() - 1);
+		return ReverseStringIterator(this, size() - 1);
 	}
 	String::const_reverse_iterator String::rbegin() const
 	{
-		return ReverseStringIterator(this, size() - 1);//StringIterator(this, size() - 1);
+		return ReverseStringIterator(this, size() - 1);
 	}
 	String::reverse_iterator String::rend()
 	{
-		return ReverseStringIterator(this, -1);//StringIterator(this, -1);
+		return ReverseStringIterator(this, -1);
 	}
 	String::const_reverse_iterator String::rend() const
 	{
-		return ReverseStringIterator(this, -1);//StringIterator(this, -1);
+		return ReverseStringIterator(this, -1);
 	}
 	String::const_iterator String::cbegin() const
 	{
@@ -160,7 +160,6 @@ namespace U8
 	String::String() :
 	m_sharedString(&emptyString)
 	{
-		//ctor
 	}
 
 	String::String(char character) :
@@ -698,11 +697,28 @@ namespace U8
 		return { 0, this };
 	}
 
+	String& String::insert(size_type index, size_type count, char character)
+	{
+		insert(StringIterator(this, index), count, Character(character));
+
+		return *this;
+	}
+
 	String& String::insert(size_type index, size_type count, const Character& character)
 	{
 		insert(StringIterator(this, index), count, character);
 
 		return *this;
+	}
+
+	String& String::insert(size_type index, const String& string, size_type subpos, size_type sublen)
+	{
+		return insert(index, string.substr(subpos, sublen));
+	}
+
+	String& String::insert(size_type index, const String& string)
+	{
+		return insert(index, string.data());
 	}
 
 	String& String::insert(size_type index, const char* string)
@@ -896,7 +912,7 @@ namespace U8
 	{
 		size_type oldSize = size();
 
-		// Nous avons déjà la place requise
+		// We already have enough space
 		if (bufferSize <= capacity())
 			return;
 

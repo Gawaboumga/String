@@ -15,6 +15,9 @@ namespace U8
 	{
 		template <class RandomIter>
 		using RequireRandomIter = typename std::enable_if<std::is_convertible<typename std::iterator_traits<RandomIter>::iterator_category, std::random_access_iterator_tag>::value>::type;
+		template <class InputIter>
+		using RequireInputIter = typename std::enable_if<std::is_convertible<typename std::iterator_traits<InputIter>::iterator_category, std::input_iterator_tag>::value>::type;
+
 
 		public:
 
@@ -101,8 +104,8 @@ namespace U8
 			String(const String& string, size_type pos, size_type count);
 			String(const char* string, size_type count);
 			String(const char* string);
-			template <typename RandomIter, typename = RequireRandomIter<RandomIter>>
-			String(RandomIter first, RandomIter last);
+			template <typename InputIter, typename = RequireInputIter<InputIter>>
+			String(InputIter first, InputIter last);
 			String(const std::string& string);
 			String(const String& string);
 			String(String&& string) noexcept;
@@ -123,8 +126,8 @@ namespace U8
 			void assign(const char* string, size_type count);
 			void assign(const char* string);
 			void assign(const_iterator first, const_iterator last);
-			template <typename RandomIter, typename = RequireRandomIter<RandomIter>>
-			void assign(RandomIter first, RandomIter last);
+			template <typename InputIter, typename = RequireInputIter<InputIter>>
+			void assign(InputIter first, InputIter last);
 			void assign(std::initializer_list<const char*> init);
 			void assign(std::initializer_list<Character> init);
 			void assign(std::initializer_list<char> init);
@@ -163,12 +166,15 @@ namespace U8
 			Character front();
 			const Character front() const;
 
+			String& insert(size_type index, size_type count, char character);
 			String& insert(size_type index, size_type count, const Character& character);
+			String& insert(size_type index, const String& string, size_type subpos, size_type sublen = npos);
+			String& insert(size_type index, const String& string);
 			String& insert(size_type index, const char* string);
 			iterator insert(const_iterator pos, const Character& character);
 			iterator insert(const_iterator pos, size_type count, const Character& character);
-			template <typename RandomIter, typename = RequireRandomIter<RandomIter>>
-			iterator insert(const_iterator pos, RandomIter first, RandomIter last);
+			template <typename InputIter, typename = RequireInputIter<InputIter>>
+			iterator insert(const_iterator pos, InputIter first, InputIter last);
 			iterator insert(const_iterator pos, std::initializer_list<Character> ilist);
 
 			size_type max_size() const;
@@ -236,7 +242,18 @@ namespace U8
 				std::atomic_ushort refCount;
 			};
 
+			template <typename InputIter>
+			void assign(InputIter first, InputIter last, std::input_iterator_tag);
+			template <typename RandomIter>
+			void assign(RandomIter first, RandomIter last, std::random_access_iterator_tag);
+
 			void ensure_ownership();
+
+			template <typename InputIter>
+			iterator insert(const_iterator pos, InputIter first, InputIter last, std::input_iterator_tag);
+			template <typename RandomIter>
+			iterator insert(const_iterator pos, RandomIter first, RandomIter last, std::random_access_iterator_tag);
+
 			pointer raw_buffer();
 			size_type raw_size() const;
 			void release_string();
