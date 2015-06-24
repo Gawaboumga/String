@@ -905,10 +905,18 @@ namespace U8
 		std::copy(data(), data() + capacity(), newBuffer);
 		release_string();
 
-		m_sharedString = new SharedString;
-		m_sharedString->buffer = newBuffer;
-		m_sharedString->capacity = bufferSize;
-		m_sharedString->size = oldSize;
+		try
+		{
+			m_sharedString = new SharedString;
+			m_sharedString->buffer = newBuffer;
+			m_sharedString->capacity = bufferSize;
+			m_sharedString->size = oldSize;
+		}
+		catch(std::exception& e)
+		{
+			delete[] newBuffer;
+			throw e;
+		}
 	}
 
 	void String::resize(size_type count, const Character& character)
