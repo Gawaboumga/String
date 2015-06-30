@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <locale>
 #include <string>
+#include <vector>
 
 namespace U8
 {
@@ -30,6 +31,7 @@ namespace U8
 			Character(char character);
 			Character(const char* character);
 			Character(const Character& character);
+			Character(const std::vector<Character>& character);
 			Character(Character&& character) = default;
 			~Character();
 
@@ -68,9 +70,9 @@ namespace U8
 
 			operator std::basic_string<char> () const;
 
-			Character tolower(const std::locale& locale = std::locale()) const;
-			Character totitlecase(const std::locale& locale = std::locale()) const;
-			Character toupper(const std::locale& locale = std::locale()) const;
+			std::vector<Character> tolower(const std::locale& locale = std::locale()) const;
+			std::vector<Character> totitlecase(const std::locale& locale = std::locale()) const;
+			std::vector<Character> toupper(const std::locale& locale = std::locale()) const;
 
 			friend std::istream& operator>>(std::istream& is, Character& character);
 
@@ -81,6 +83,8 @@ namespace U8
 		private:
 
 			Character(size_type position, const String* string);
+
+			std::vector<Character> convert_multi_unicodes(const std::array<UnicodeData::Unicode, 3>& unicodes) const;
 
 			void fromCodePoint(UnicodeData::Unicode codePoint);
 

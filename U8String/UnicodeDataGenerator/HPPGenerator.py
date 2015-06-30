@@ -5,10 +5,11 @@ from GeneralCategoryEnum import GeneralCategoryEnum
 
 class HPPGenerator:
 
-    def __init__(self, output, datas):
+    def __init__(self, output, datas, specialCasing):
 
         self.__output = output
         self.__datas = datas
+        self.__specialCasing = specialCasing
 
     def generate(self):
 
@@ -48,7 +49,7 @@ class HPPGenerator:
 
         ofile.write("\tpublic:\n\n")
 
-        ofile.write("\t\tusing Unicode = unsigned int;\n\n")
+        ofile.write("\t\tusing Unicode = uint64_t;\n\n")
 
     def __writeEnum(self, ofile, enum):
 
@@ -74,6 +75,12 @@ class HPPGenerator:
         ofile.write("\t\tstatic Unicode titlecase_mapping(Unicode character);\n\n")
         ofile.write("\t\tstatic Unicode uppercase_mapping(Unicode character);\n\n")
 
+        if self.__specialCasing is not None:
+
+            ofile.write("\t\tstatic std::array<Unicode, 3> special_lowercase_mapping(Unicode character);\n\n")
+            ofile.write("\t\tstatic std::array<Unicode, 3> special_titlecase_mapping(Unicode character);\n\n")
+            ofile.write("\t\tstatic std::array<Unicode, 3> special_uppercase_mapping(Unicode character);\n\n")
+
     def __writePrivate(self, ofile):
 
         ofile.write("\tprivate:\n\n")
@@ -95,3 +102,11 @@ class HPPGenerator:
         ofile.write("\t\tstatic std::array<std::pair<Unicode, bool>, " + numberMirror + "> m_mirrors;\n")
         ofile.write("\t\tstatic std::array<std::pair<Unicode, Unicode>, " + numberTitles + "> m_titles;\n")
         ofile.write("\t\tstatic std::array<std::pair<Unicode, Unicode>, " + numberUppers + "> m_uppers;\n")
+
+        if self.__specialCasing is not None:
+            numberSpecialLowers = str(self.__specialCasing[0])
+            numberSpecialTitles = str(self.__specialCasing[1])
+            numberSpecialUppers = str(self.__specialCasing[2])
+            ofile.write("\t\tstatic std::array<std::pair<Unicode, std::array<Unicode, 3>>, " + numberSpecialLowers + "> m_specialLowers;\n")
+            ofile.write("\t\tstatic std::array<std::pair<Unicode, std::array<Unicode, 3>>, " + numberSpecialTitles + "> m_specialTitles;\n")
+            ofile.write("\t\tstatic std::array<std::pair<Unicode, std::array<Unicode, 3>>, " + numberSpecialUppers + "> m_specialUppers;\n")

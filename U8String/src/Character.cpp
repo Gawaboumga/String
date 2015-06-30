@@ -34,6 +34,14 @@ namespace U8
 		assign(character.byte);
 	}
 
+	Character::Character(const std::vector<Character>& character) :
+		m_position(0), m_string(nullptr)
+	{
+		if (character.size() != 1)
+			throw std::invalid_argument("Character class contains only one character.");
+		assign(character[0]);
+	}
+
 	Character::~Character()
 	{
 	}
@@ -232,35 +240,53 @@ namespace U8
 		return std::basic_string<char>(byteArray);
 	}
 
-	Character Character::tolower(const std::locale& /*locale*/) const
+	std::vector<Character> Character::tolower(const std::locale& /*locale*/) const
 	{
 		//! Todo use locale for azeri and so on http://unicode.org/faq/casemap_charprop.html
-		UnicodeData::Unicode unicode = UnicodeData::lowercase_mapping(code_point());
+		std::array<UnicodeData::Unicode, 3> unicodes = UnicodeData::special_lowercase_mapping(code_point());
 
-		Character tmp;
-		tmp.fromCodePoint(unicode);
+		if (unicodes[0] == '\0')
+		{
+			UnicodeData::Unicode unicode = UnicodeData::lowercase_mapping(code_point());
 
-		return tmp;
+			Character tmp;
+			tmp.fromCodePoint(unicode);
+			return { tmp };
+		}
+
+		return convert_multi_unicodes(unicodes);
 	}
 
-	Character Character::totitlecase(const std::locale& /*locale*/) const
+	std::vector<Character> Character::totitlecase(const std::locale& /*locale*/) const
 	{
-		UnicodeData::Unicode unicode = UnicodeData::titlecase_mapping(code_point());
+		std::array<UnicodeData::Unicode, 3> unicodes = UnicodeData::special_titlecase_mapping(code_point());
 
-		Character tmp;
-		tmp.fromCodePoint(unicode);
+		if (unicodes[0] == '\0')
+		{
+			UnicodeData::Unicode unicode = UnicodeData::titlecase_mapping(code_point());
 
-		return tmp;
+			Character tmp;
+			tmp.fromCodePoint(unicode);
+			return { tmp };
+		}
+
+		return convert_multi_unicodes(unicodes);
 	}
 
-	Character Character::toupper(const std::locale& /*locale*/) const
+	std::vector<Character> Character::toupper(const std::locale& /*locale*/) const
 	{
-		UnicodeData::Unicode unicode = UnicodeData::uppercase_mapping(code_point());
+		std::array<UnicodeData::Unicode, 3> unicodes = UnicodeData::special_uppercase_mapping(code_point());
 
-		Character tmp;
-		tmp.fromCodePoint(unicode);
+		if (unicodes[0] == '\0')
+		{
+			UnicodeData::Unicode unicode = UnicodeData::uppercase_mapping(code_point());
 
-		return tmp;
+			Character tmp;
+			tmp.fromCodePoint(unicode);
+			return { tmp };
+		}
+
+		return convert_multi_unicodes(unicodes);
 	}
 
 	Character Character::fromUTF16(const char16_t character[3])
@@ -316,6 +342,22 @@ namespace U8
 		{
 			byte[i] = '\0';
 		}
+	}
+
+	std::vector<Character> Character::convert_multi_unicodes(const std::array<UnicodeData::Unicode, 3>& unicodes) const
+	{
+		auto it = unicodes.begin();
+		std::vector<Character> tmpReturn;
+		while (it != unicodes.end() && *it != '\0')
+		{
+			Character tmp;
+			tmp.fromCodePoint(*it);
+			tmpReturn.push_back(tmp);
+
+			++it;
+		}
+
+		return tmpReturn;
 	}
 
 	void Character::fromCodePoint(UnicodeData::Unicode codePoint)

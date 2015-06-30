@@ -94,7 +94,7 @@ SCENARIO("Character", "[CORE]")
 		WHEN("We do upper and lower")
 		{
 
-			THEN("Griek letters are funny")
+			THEN("Greek letters are funny")
 			{
 
 				Character upperSigma(u8"Σ");

@@ -3,28 +3,36 @@ import sys
 
 import CPPGenerator
 import HPPGenerator
+import SpecialCasingParser
 import UnicodeDataParser
 
 def main(argv):
 
-    if len(argv) != 3:
-        print("Use python3 " + argv[0] + " UnicodeData.txt filesNameOutput")
+    if len(argv) != 3 and len(argv) != 4:
+        print("Use python3 " + argv[0] + " (SpecialCasing.txt) UnicodeData.txt filesNameOutput")
         return
 
-    inputFile = argv[1]
-    output = argv[2]
+    multicase = None
+
+    if len(argv) == 3:
+        inputFile = argv[1]
+        output = argv[2]
+    else:
+        if not isfile(argv[1]):
+            print("The inputFile: " + argv[1] + " is not a valid path.")
+            return
+        multicase = argv[1]
+        inputFile = argv[2]
+        output = argv[3]
 
     if not isfile(inputFile):
         print("The inputFile: " + inputFile + " is not a valid path.")
+        return
 
     unicodeDataParser = UnicodeDataParser.UnicodeDataParser()
 
     datas = None
-    #try:
     datas = unicodeDataParser.parse(inputFile)
-    """except Exception as e:
-        print(e)
-        return"""
 
     oldBidi = datas[0].getBidi()
     oldCategory = datas[0].getCategory()
@@ -76,12 +84,19 @@ def main(argv):
 
     numbers = [len(listBidi), len(listCate), len(listCombi), len(listLower), len(listMirror), len(listTitle), len(listUpper)]
 
-    generatorHPP = HPPGenerator.HPPGenerator(output, numbers)
+    numbersSpecialCasing = None
+    specialCasing = None
+    if multicase is not None:
+        specialCasingParser = SpecialCasingParser.SpecialCasingParser(multicase)
+        specialCasing = specialCasingParser.parse()
+        numbersSpecialCasing = [len(specialCasing[0]), len(specialCasing[1]), len(specialCasing[2])]
+
+    generatorHPP = HPPGenerator.HPPGenerator(output, numbers, numbersSpecialCasing)
     generatorHPP.generate()
 
     ranges = [listBidi, listCate, listCombi, listLower, listMirror, listTitle, listUpper]
 
-    generatorCPP = CPPGenerator.CPPGenerator(output, ranges)
+    generatorCPP = CPPGenerator.CPPGenerator(output, ranges, specialCasing)
     generatorCPP.generate()
 
 

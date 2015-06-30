@@ -176,6 +176,13 @@ namespace U8
 			assign(1, character);
 	}
 
+	String::String(const std::vector<Character>& characters) :
+	m_sharedString(&emptyString)
+	{
+		if (!characters.empty())
+			assign(characters);
+	}
+
 	String::String(size_type rep, char character) :
 	m_sharedString(&emptyString)
 	{
@@ -270,6 +277,21 @@ namespace U8
 	String& String::append(const String& string)
 	{
 		return insert(size(), string.data());
+	}
+
+	void String::assign(const std::vector<Character>& characters)
+	{
+		if (!characters.empty())
+		{
+			ensure_ownership();
+
+			clear(true);
+
+			for (auto character : characters)
+				push_back(character);
+		}
+		else
+			release_string();
 	}
 
 	void String::assign(size_type n, char character)
@@ -788,6 +810,13 @@ namespace U8
 	String::size_type String::max_size() const
 	{
 		return npos;
+	}
+
+	String& String::operator=(const std::vector<Character>& characters)
+	{
+		assign(characters);
+
+		return *this;
 	}
 
 	String& String::operator=(const String& other)

@@ -18,7 +18,6 @@ namespace U8
 		template <class InputIter>
 		using RequireInputIter = typename std::enable_if<std::is_convertible<typename std::iterator_traits<InputIter>::iterator_category, std::input_iterator_tag>::value>::type;
 
-
 		public:
 
 			typedef char value_type;
@@ -99,6 +98,7 @@ namespace U8
 			String();
 			String(char character);
 			String(const Character& character);
+			String(const std::vector<Character>& characters);
 			String(size_type rep, char character);
 			String(size_type rep, const Character& character);
 			String(const String& string, size_type pos, size_type count);
@@ -118,6 +118,7 @@ namespace U8
 			String& append(const char* string);
 			String& append(const String& string);
 
+			void assign(const std::vector<Character>& characters);
 			void assign(size_type n, char character);
 			void assign(size_type n, const Character& character);
 			void assign(const String& string);
@@ -179,6 +180,7 @@ namespace U8
 
 			size_type max_size() const;
 
+			String& operator=(const std::vector<Character>& characters);
 			String& operator=(const String& other);
 			String& operator=(String&& other) noexcept;
 			String& operator=(const char* string);

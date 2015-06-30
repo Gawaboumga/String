@@ -8,7 +8,7 @@ class UnicodeData
 {
 	public:
 
-		using Unicode = unsigned int;
+		using Unicode = uint64_t;
 
 		enum class BidirectionalCategory
 		{
@@ -85,6 +85,12 @@ class UnicodeData
 
 		static Unicode uppercase_mapping(Unicode character);
 
+		static std::array<Unicode, 3> special_lowercase_mapping(Unicode character);
+
+		static std::array<Unicode, 3> special_titlecase_mapping(Unicode character);
+
+		static std::array<Unicode, 3> special_uppercase_mapping(Unicode character);
+
 	private:
 
 		static std::array<std::pair<Unicode, BidirectionalCategory>, 801> m_bidirectionals;
@@ -94,6 +100,9 @@ class UnicodeData
 		static std::array<std::pair<Unicode, bool>, 222> m_mirrors;
 		static std::array<std::pair<Unicode, Unicode>, 1104> m_titles;
 		static std::array<std::pair<Unicode, Unicode>, 1100> m_uppers;
+		static std::array<std::pair<Unicode, std::array<Unicode, 3>>, 7> m_specialLowers;
+		static std::array<std::pair<Unicode, std::array<Unicode, 3>>, 78> m_specialTitles;
+		static std::array<std::pair<Unicode, std::array<Unicode, 3>>, 78> m_specialUppers;
 };
 
 #endif // __UNICODEDATA_HPP__

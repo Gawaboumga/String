@@ -874,4 +874,15 @@ SCENARIO("String", "[CORE]")
 
 	}
 
+	GIVEN("Character mapping to multibyte")
+	{
+		String tmp;
+		tmp = Character(u8"\u1FA1").totitlecase();
+		REQUIRE(tmp == u8"\u1FA9");
+		tmp = Character(u8"\u1FA1").toupper();
+		REQUIRE(tmp.size() == 2);
+		REQUIRE(tmp == u8"\u1F69\u0399");
+
+	}
+
 }
