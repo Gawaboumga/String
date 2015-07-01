@@ -232,8 +232,13 @@ namespace U8
 
 	std::vector<Character> Character::tomultilower(const std::locale& locale) const
 	{
-		//! Todo use locale for azeri and so on http://unicode.org/faq/casemap_charprop.html
-		std::array<UnicodeData::Unicode, 3> unicodes = UnicodeData::special_lowercase_mapping(code_point());
+		auto codepoint = code_point();
+
+		std::array<UnicodeData::Unicode, 3> unicodes;
+		if (codepoint == 0x49 && locale.name() != "lt_LT.utf8")
+			unicodes = { '\0' };
+		else
+			unicodes = UnicodeData::special_lowercase_mapping(codepoint);
 
 		if (unicodes[0] == '\0')
 			return { tolower(locale) };
@@ -243,7 +248,11 @@ namespace U8
 
 	std::vector<Character> Character::tomultititlecase(const std::locale& locale) const
 	{
-		std::array<UnicodeData::Unicode, 3> unicodes = UnicodeData::special_titlecase_mapping(code_point());
+		auto codepoint = code_point();
+
+		std::array<UnicodeData::Unicode, 3> unicodes = { { '\0' } };
+		if (codepoint != 0x69)
+			unicodes = UnicodeData::special_titlecase_mapping(codepoint);
 
 		if (unicodes[0] == '\0')
 			return { totitlecase(locale) };
@@ -253,7 +262,11 @@ namespace U8
 
 	std::vector<Character> Character::tomultiupper(const std::locale& locale) const
 	{
-		std::array<UnicodeData::Unicode, 3> unicodes = UnicodeData::special_uppercase_mapping(code_point());
+		auto codepoint = code_point();
+
+		std::array<UnicodeData::Unicode, 3> unicodes = { { '\0' } };
+		if (codepoint != 0x69)
+			unicodes = UnicodeData::special_uppercase_mapping(codepoint);
 
 		if (unicodes[0] == '\0')
 			return { toupper(locale) };
@@ -261,30 +274,59 @@ namespace U8
 		return convert_multi_unicodes(unicodes);
 	}
 
-	Character Character::tolower(const std::locale& /*locale*/) const
+	Character Character::tolower(const std::locale& locale) const
 	{
-		//! Todo use locale for azeri and so on http://unicode.org/faq/casemap_charprop.html
-		UnicodeData::Unicode unicode = UnicodeData::lowercase_mapping(code_point());
+		auto codePoint = code_point();
 
 		Character tmp;
+
+		if (locale.name() == "tr_TR.utf8" || locale.name() == "az_AZ.utf8")
+			if (codePoint == 0x49)
+			{
+				tmp.fromCodePoint(0x131);
+				return tmp;
+			}
+
+		UnicodeData::Unicode unicode = UnicodeData::lowercase_mapping(codePoint);
+
 		tmp.fromCodePoint(unicode);
 		return tmp;
 	}
 
-	Character Character::totitlecase(const std::locale& /*locale*/) const
+	Character Character::totitlecase(const std::locale& locale) const
 	{
-		UnicodeData::Unicode unicode = UnicodeData::titlecase_mapping(code_point());
+		auto codePoint = code_point();
 
 		Character tmp;
+
+		if (locale.name() == "tr_TR.utf8" || locale.name() == "az_AZ.utf8")
+			if (codePoint == 0x69)
+			{
+				tmp.fromCodePoint(0x130);
+				return tmp;
+			}
+
+		UnicodeData::Unicode unicode = UnicodeData::titlecase_mapping(codePoint);
+
 		tmp.fromCodePoint(unicode);
 		return tmp;
 	}
 
-	Character Character::toupper(const std::locale& /*locale*/) const
+	Character Character::toupper(const std::locale& locale) const
 	{
-		UnicodeData::Unicode unicode = UnicodeData::uppercase_mapping(code_point());
+		auto codePoint = code_point();
 
 		Character tmp;
+
+		if (locale.name() == "tr_TR.utf8" || locale.name() == "az_AZ.utf8")
+			if (codePoint == 0x69)
+			{
+				tmp.fromCodePoint(0x130);
+				return tmp;
+			}
+
+		UnicodeData::Unicode unicode = UnicodeData::uppercase_mapping(codePoint);
+
 		tmp.fromCodePoint(unicode);
 
 		return tmp;

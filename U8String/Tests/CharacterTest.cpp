@@ -8,7 +8,7 @@ SCENARIO("Character", "[CORE]")
 
 	using Character = U8::Character;
 
-	GIVEN("One character.")
+	GIVEN("No character.")
 	{
 
 		WHEN("We test for constructors.")
@@ -50,6 +50,11 @@ SCENARIO("Character", "[CORE]")
 
 		}
 
+	}
+
+	GIVEN("One empty character")
+	{
+
 		WHEN("We test assignation.")
 		{
 
@@ -75,6 +80,11 @@ SCENARIO("Character", "[CORE]")
 
 		}
 
+	}
+
+	GIVEN("Two accentuated characters")
+	{
+
 		WHEN("We test comparison")
 		{
 
@@ -90,6 +100,11 @@ SCENARIO("Character", "[CORE]")
 			}
 
 		}
+
+	}
+
+	GIVEN("Character sigma")
+	{
 
 		WHEN("We do upper and lower")
 		{
@@ -108,13 +123,64 @@ SCENARIO("Character", "[CORE]")
 
 		}
 
+	}
+
+	GIVEN("The Character I")
+	{
+
+		Character capitalI(u8"I");
+
+		WHEN("We use azeri or turk")
+		{
+
+			THEN("The lower case is")
+			{
+
+				REQUIRE(capitalI.tolower(std::locale("tr_TR.utf8")) == u8"\u0131");
+
+			}
+
+			AND_THEN("The upper case")
+			{
+
+				REQUIRE(Character(u8"i").toupper(std::locale("tr_TR.utf8")) == u8"\u0130");
+
+			}
+
+		}
+
+		WHEN("We use others than azeri or turk")
+		{
+
+			THEN("The lower case is")
+			{
+
+				REQUIRE(capitalI.tolower(std::locale("en_US.utf8")) == u8"i");
+
+			}
+
+			AND_THEN("The upper case")
+			{
+
+				REQUIRE(Character(u8"i").toupper(std::locale("en_US.utf8")) == u8"I");
+
+			}
+
+		}
+
+	}
+
+	GIVEN("The character E acute")
+	{
+
+		Character e(u8"é");
+
 		WHEN("We have different unicode")
 		{
 
 			THEN("They must be equal to utf8")
 			{
 
-				Character e(u8"é");
 				REQUIRE(e == Character::fromUTF16(u"é"));
 				REQUIRE(e == Character::fromUTF32(U"é"));
 				//REQUIRE(e == Character::fromWide(L"é"));
@@ -134,7 +200,6 @@ SCENARIO("Character", "[CORE]")
 			THEN("Unicode defines these properties")
 			{
 
-				Character e(u8"é");
 				REQUIRE(e.category() == UnicodeData::GeneralCategory::Ll);
 				REQUIRE(e.combining_class() == 0);
 				REQUIRE(e.direction() == UnicodeData::BidirectionalCategory::L);

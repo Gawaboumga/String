@@ -967,6 +967,72 @@ SCENARIO("String", "[CORE]")
 
 		}
 
+	}
+
+	GIVEN("The string I and i")
+	{
+
+		String upperI(u8"I");
+		String lowerI(u8"i");
+
+
+		WHEN("We use azeri or turk")
+		{
+
+			THEN("The lower case is")
+			{
+
+				REQUIRE(upperI.tolower(std::locale("tr_TR.utf8")) == u8"\u0131");
+
+			}
+
+			AND_THEN("The upper case")
+			{
+
+				REQUIRE(lowerI.toupper(std::locale("tr_TR.utf8")) == u8"\u0130");
+
+			}
+
+		}
+
+		WHEN("We use lithuanian")
+		{
+
+			THEN("The lower case is")
+			{
+
+				REQUIRE(upperI.tolower(std::locale("lt_LT.utf8")) == u8"\u0069\u0307");
+
+			}
+
+			AND_THEN("The upper case")
+			{
+
+				String lowerString = upperI.tolower(std::locale("lt_LT.utf8"));
+				REQUIRE(lowerString.toupper(std::locale("lt_LT.utf8")) == u8"I");
+
+			}
+
+		}
+
+		WHEN("We use others than azeri, turk or lithuanian")
+		{
+
+			THEN("The lower case is")
+			{
+
+				REQUIRE(upperI.tolower(std::locale("en_US.utf8")) == u8"i");
+
+			}
+
+			AND_THEN("The upper case")
+			{
+
+				REQUIRE(lowerI.toupper(std::locale("en_US.utf8")) == u8"I");
+
+			}
+
+		}
 
 	}
 

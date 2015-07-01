@@ -1,6 +1,7 @@
 //- Find_last, ...
 //- inputIt
-- Multi character mapping upper/lower
+//- Multi character mapping upper/lower
+- Add functionalities (STL -> replace, and maybe others ?)
 - Allocator
 - Regex
 - Capacity -> convert to pointer ?

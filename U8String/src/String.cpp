@@ -1136,6 +1136,9 @@ namespace U8
 
 		for (auto it = begin(); it != end(); ++it)
 		{
+			if (locale.name() == "lt_LT.utf8" && *it == u8"\u0307")
+				continue;
+
 			std::vector<Character> tmpLower = (*it).tomultititlecase(locale);
 			for (auto character : tmpLower)
 				tmp.push_back(character);
@@ -1151,6 +1154,9 @@ namespace U8
 
 		for (auto it = begin(); it != end(); ++it)
 		{
+			if (locale.name() == "lt_LT.utf8" && *it == u8"\u0307")
+				continue;
+
 			std::vector<Character> tmpLower = (*it).tomultiupper(locale);
 			for (auto character : tmpLower)
 				tmp.push_back(character);
