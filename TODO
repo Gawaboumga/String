@@ -1,6 +1,7 @@
 //- Find_last, ...
 //- inputIt
 //- Multi character mapping upper/lower
+- Documentation
 - Add functionalities (STL -> replace, and maybe others ?)
 - Allocator
 - Regex
