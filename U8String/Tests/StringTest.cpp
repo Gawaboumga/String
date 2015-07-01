@@ -726,6 +726,66 @@ SCENARIO("String", "[CORE]")
 
 		}
 
+		WHEN("We take examples from cplusplus.com")
+		{
+
+			THEN("These should work for find_first_of")
+			{
+
+				String str = u8"Please, replace the vowels in this sentence by asterisks.";
+				String::size_type found = str.find_first_of(u8"aeiouy");
+				while(found != String::npos)
+				{
+					str[found] = '*';
+					found = str.find_first_of(u8"aeiouy", found + 1);
+				}
+
+				REQUIRE(str == u8"Pl**s*, r*pl*c* th* v*w*ls *n th*s s*nt*nc* b* *st*r*sks.");
+
+			}
+
+			THEN("These should work for find_first_not_of")
+			{
+
+				String str = u8"look for non-alphabetic characters...";
+				String::size_type found = str.find_first_not_of(u8"abcdefghijklmnopqrstiuvwxyz ");
+
+				REQUIRE(str[found] == u8"-");
+				REQUIRE(found == 12);
+
+			}
+
+			THEN("These should work for find_last_of")
+			{
+
+				String str1 = u8"/usr/bin/man";
+				String str2 = u8"c:\\windows\\winhelp.exe";
+				String::size_type found1 = str1.find_last_of(u8"/\\");
+				String::size_type found2 = str2.find_last_of(u8"/\\");
+
+				REQUIRE(str1.substr(0, found1) == u8"/usr/bin");
+				REQUIRE(str1.substr(found1 + 1) == u8"man");
+
+				REQUIRE(str2.substr(0, found2) == u8"c:\\windows");
+				REQUIRE(str2.substr(found2 + 1) == u8"winhelp.exe");
+
+			}
+
+			THEN("These should work for find_last_not_of")
+			{
+
+				String str = u8"Please, erase trailing white-spaces   \n";
+				String whitespaces = u8" \t\f\v\n\r";
+
+				String::size_type found = str.find_last_not_of(whitespaces);
+				str.erase(found + 1);
+
+				REQUIRE(str == u8"Please, erase trailing white-spaces");
+
+			}
+
+		}
+
 	}
 
 	GIVEN("One random string")
