@@ -31,15 +31,7 @@ namespace U8
 	Character::Character(const Character& character) :
 		m_position(0), m_string(nullptr)
 	{
-		assign(character.byte);
-	}
-
-	Character::Character(const std::vector<Character>& character) :
-		m_position(0), m_string(nullptr)
-	{
-		if (character.size() != 1)
-			throw std::invalid_argument("Character class contains only one character.");
-		assign(character[0]);
+		assign(character);
 	}
 
 	Character::~Character()
@@ -50,6 +42,9 @@ namespace U8
 	{
 		byte[0] = character;
 		byte[1] = '\0';
+
+		if (m_string)
+			m_string->replace(m_position, 1, *this);
 	}
 
 	void Character::assign(const char* character)
@@ -65,14 +60,18 @@ namespace U8
 		}
 
 		if (i < 4)
-		{
 			byte[i] = '\0';
-		}
+
+		if (m_string)
+			m_string->replace(m_position, 1, *this);
 	}
 
 	void Character::assign(const Character& character)
 	{
-		std::copy(character.byte, character.byte + character.number_byte(), byte);
+		std::copy(character.byte, character.byte + 4, byte);
+
+		if (m_string)
+			m_string->replace(m_position, 1, *this);
 	}
 
 	UnicodeData::GeneralCategory Character::category() const
@@ -191,9 +190,6 @@ namespace U8
 	{
 		assign(character);
 
-		if (m_string)
-			m_string->replace(m_position, 1, *this);
-
 		return *this;
 	}
 
@@ -201,18 +197,12 @@ namespace U8
 	{
 		assign(character);
 
-		if (m_string)
-			m_string->replace(m_position, 1, *this);
-
 		return *this;
 	}
 
 	Character& Character::operator=(const Character& character)
 	{
 		assign(character);
-
-		if (m_string)
-			m_string->replace(m_position, 1, *this);
 
 		return *this;
 	}
@@ -240,53 +230,64 @@ namespace U8
 		return std::basic_string<char>(byteArray);
 	}
 
-	std::vector<Character> Character::tolower(const std::locale& /*locale*/) const
+	std::vector<Character> Character::tomultilower(const std::locale& locale) const
 	{
 		//! Todo use locale for azeri and so on http://unicode.org/faq/casemap_charprop.html
 		std::array<UnicodeData::Unicode, 3> unicodes = UnicodeData::special_lowercase_mapping(code_point());
 
 		if (unicodes[0] == '\0')
-		{
-			UnicodeData::Unicode unicode = UnicodeData::lowercase_mapping(code_point());
-
-			Character tmp;
-			tmp.fromCodePoint(unicode);
-			return { tmp };
-		}
+			return { tolower(locale) };
 
 		return convert_multi_unicodes(unicodes);
 	}
 
-	std::vector<Character> Character::totitlecase(const std::locale& /*locale*/) const
+	std::vector<Character> Character::tomultititlecase(const std::locale& locale) const
 	{
 		std::array<UnicodeData::Unicode, 3> unicodes = UnicodeData::special_titlecase_mapping(code_point());
 
 		if (unicodes[0] == '\0')
-		{
-			UnicodeData::Unicode unicode = UnicodeData::titlecase_mapping(code_point());
-
-			Character tmp;
-			tmp.fromCodePoint(unicode);
-			return { tmp };
-		}
+			return { totitlecase(locale) };
 
 		return convert_multi_unicodes(unicodes);
 	}
 
-	std::vector<Character> Character::toupper(const std::locale& /*locale*/) const
+	std::vector<Character> Character::tomultiupper(const std::locale& locale) const
 	{
 		std::array<UnicodeData::Unicode, 3> unicodes = UnicodeData::special_uppercase_mapping(code_point());
 
 		if (unicodes[0] == '\0')
-		{
-			UnicodeData::Unicode unicode = UnicodeData::uppercase_mapping(code_point());
-
-			Character tmp;
-			tmp.fromCodePoint(unicode);
-			return { tmp };
-		}
+			return { toupper(locale) };
 
 		return convert_multi_unicodes(unicodes);
+	}
+
+	Character Character::tolower(const std::locale& /*locale*/) const
+	{
+		//! Todo use locale for azeri and so on http://unicode.org/faq/casemap_charprop.html
+		UnicodeData::Unicode unicode = UnicodeData::lowercase_mapping(code_point());
+
+		Character tmp;
+		tmp.fromCodePoint(unicode);
+		return tmp;
+	}
+
+	Character Character::totitlecase(const std::locale& /*locale*/) const
+	{
+		UnicodeData::Unicode unicode = UnicodeData::titlecase_mapping(code_point());
+
+		Character tmp;
+		tmp.fromCodePoint(unicode);
+		return tmp;
+	}
+
+	Character Character::toupper(const std::locale& /*locale*/) const
+	{
+		UnicodeData::Unicode unicode = UnicodeData::uppercase_mapping(code_point());
+
+		Character tmp;
+		tmp.fromCodePoint(unicode);
+
+		return tmp;
 	}
 
 	Character Character::fromUTF16(const char16_t character[3])

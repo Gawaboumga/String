@@ -215,6 +215,10 @@ namespace U8
 			String substr(size_type pos = 0, size_type count = npos) const;
 			void swap(String& other);
 
+			String tolower(const std::locale& locale = std::locale()) const;
+			String totitlecase(const std::locale& locale = std::locale()) const;
+			String toupper(const std::locale& locale = std::locale()) const;
+
 			static const size_type npos;
 
 		private:

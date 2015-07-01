@@ -31,7 +31,6 @@ namespace U8
 			Character(char character);
 			Character(const char* character);
 			Character(const Character& character);
-			Character(const std::vector<Character>& character);
 			Character(Character&& character) = default;
 			~Character();
 
@@ -70,9 +69,12 @@ namespace U8
 
 			operator std::basic_string<char> () const;
 
-			std::vector<Character> tolower(const std::locale& locale = std::locale()) const;
-			std::vector<Character> totitlecase(const std::locale& locale = std::locale()) const;
-			std::vector<Character> toupper(const std::locale& locale = std::locale()) const;
+			std::vector<Character> tomultilower(const std::locale& locale = std::locale()) const;
+			std::vector<Character> tomultititlecase(const std::locale& locale = std::locale()) const;
+			std::vector<Character> tomultiupper(const std::locale& locale = std::locale()) const;
+			Character tolower(const std::locale& locale = std::locale()) const;
+			Character totitlecase(const std::locale& locale = std::locale()) const;
+			Character toupper(const std::locale& locale = std::locale()) const;
 
 			friend std::istream& operator>>(std::istream& is, Character& character);
 

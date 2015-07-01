@@ -765,8 +765,7 @@ namespace U8
 		else
 			reserve(capacity() + distance);
 
-		if (!empty())
-			right_shift(offset, distance, capacity() - 1);
+		right_shift(offset, distance, capacity() - 1);
 
 		auto tmp = std::basic_string<char>(character);
 		for (auto i = 0U; i != count * character.number_byte(); ++i)
@@ -775,7 +774,7 @@ namespace U8
 		m_sharedString->buffer[capacity() - 1] = '\0'; // String is terminated by a '\0'.
 		m_sharedString->size += count;
 
-		return StringIterator(this, utf8::distance(raw_buffer(), raw_buffer() + offset));
+		return pos;
 	}
 
 	String::iterator String::insert(const_iterator pos, std::initializer_list<Character> ilist)
@@ -804,7 +803,7 @@ namespace U8
 		m_sharedString->buffer[capacity() - 1] = '\0'; // String is terminated by a '\0'.
 		m_sharedString->size += ilist.size();
 
-		return StringIterator(this, utf8::distance(raw_buffer(), raw_buffer() + offset));
+		return pos;
 	}
 
 	String::size_type String::max_size() const
@@ -947,7 +946,11 @@ namespace U8
 
 		pointer newBuffer = new value_type[bufferSize];
 
-		std::copy(data(), data() + capacity(), newBuffer);
+		if (capacity() == 0)
+			std::fill(newBuffer, newBuffer + ((bufferSize > 4) ? 4 : bufferSize), '\0');
+		else
+			std::copy(data(), data() + capacity(), newBuffer);
+
 		release_string();
 
 		try
@@ -977,6 +980,8 @@ namespace U8
 		if (pos >= size())
 			throw std::out_of_range("Index out of range (" + std::to_string(pos) + " >= " + std::to_string(size()) + ')');
 
+		ensure_ownership();
+
 		auto it = begin();
 		std::advance(it, pos);
 
@@ -986,6 +991,9 @@ namespace U8
 		size_type diff = it - tmp;
 		if (diff == count * character.number_byte())
 		{
+			if (empty())
+				reserve(character.number_byte() + 1);
+
 			for (auto i = 0U; i < diff; ++i)
 				tmp[i] = character.byte[i % character.number_byte()];
 
@@ -1104,6 +1112,51 @@ namespace U8
 	void String::swap(String& other)
 	{
 		std::swap(m_sharedString, other.m_sharedString);
+	}
+
+	String String::tolower(const std::locale& locale) const
+	{
+		String tmp;
+		tmp.reserve(size() + 1);
+
+		for (auto it = begin(); it != end(); ++it)
+		{
+			std::vector<Character> tmpLower = (*it).tomultilower(locale);
+			for (auto character : tmpLower)
+				tmp.push_back(character);
+		}
+
+		return tmp;
+	}
+
+	String String::totitlecase(const std::locale& locale) const
+	{
+		String tmp;
+		tmp.reserve(size() + 1);
+
+		for (auto it = begin(); it != end(); ++it)
+		{
+			std::vector<Character> tmpLower = (*it).tomultititlecase(locale);
+			for (auto character : tmpLower)
+				tmp.push_back(character);
+		}
+
+		return tmp;
+	}
+
+	String String::toupper(const std::locale& locale) const
+	{
+		String tmp;
+		tmp.reserve(size() + 1);
+
+		for (auto it = begin(); it != end(); ++it)
+		{
+			std::vector<Character> tmpLower = (*it).tomultiupper(locale);
+			for (auto character : tmpLower)
+				tmp.push_back(character);
+		}
+
+		return tmp;
 	}
 
 	void String::ensure_ownership()

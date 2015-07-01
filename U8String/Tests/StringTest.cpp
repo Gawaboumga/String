@@ -874,14 +874,61 @@ SCENARIO("String", "[CORE]")
 
 	}
 
-	GIVEN("Character mapping to multibyte")
+	GIVEN("Two strings containing the lowers")
 	{
-		String tmp;
-		tmp = Character(u8"\u1FA1").totitlecase();
-		REQUIRE(tmp == u8"\u1FA9");
-		tmp = Character(u8"\u1FA1").toupper();
-		REQUIRE(tmp.size() == 2);
-		REQUIRE(tmp == u8"\u1F69\u0399");
+
+		String toTransform(u8"a \u00DF ça và ?");
+
+		WHEN("We use transform")
+		{
+
+			std::transform(toTransform.begin(), toTransform.end(), toTransform.begin(), [](const Character& chr) { return chr.toupper(); });
+
+			THEN("No conversion to multi is done.")
+			{
+
+				REQUIRE(toTransform == u8"A \u00DF ÇA VÀ ?");
+
+			}
+
+		}
+
+		WHEN("We use toupper")
+		{
+
+			toTransform = toTransform.toupper();
+
+			THEN("Conversion to multi is done.")
+			{
+
+				REQUIRE(toTransform == u8"A SS ÇA VÀ ?");
+
+			}
+
+		}
+
+
+	}
+
+	GIVEN("One empty string")
+	{
+
+		String emptyString;
+
+		WHEN("We reserve and append characters")
+		{
+			emptyString.reserve(2);
+			emptyString.push_back(u8"ç");
+			emptyString.push_back(u8"a");
+
+			THEN("Nothing should fail")
+			{
+
+				REQUIRE(emptyString == u8"ça");
+
+			}
+
+		}
 
 	}
 
