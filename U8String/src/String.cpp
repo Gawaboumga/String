@@ -552,8 +552,10 @@ namespace U8
 
 	String::iterator String::erase(const_iterator first, const_iterator last)
 	{
-		auto lengthBeginning = begin().number_character(first);
-		auto length = first.number_character(last);
+		ensure_ownership();
+
+		auto lengthBeginning = std::distance(begin(), first);
+		auto length = std::distance(first, last);
 
 		pointer firstTmp = const_cast<pointer>(static_cast<const_pointer>(first));
 		pointer lastTmp = const_cast<pointer>(static_cast<const_pointer>(last));
@@ -975,7 +977,12 @@ namespace U8
 			m_sharedString->size = count;
 	}
 
-	void String::replace(size_type pos, size_type count, const Character& character)
+	String& String::replace(size_type pos, size_type count, const String& string)
+	{
+		return replace(StringIterator(this, pos), StringIterator(this, pos + count), string);
+	}
+
+	String& String::replace(size_type pos, size_type count, const Character& character)
 	{
 		if (pos >= size())
 			throw std::out_of_range("Index out of range (" + std::to_string(pos) + " >= " + std::to_string(size()) + ')');
@@ -1029,6 +1036,18 @@ namespace U8
 
 			m_sharedString->size += count - 1;
 		}
+
+		return *this;
+	}
+
+	String& String::replace(const_iterator first, const_iterator last, const String& string)
+	{
+		String tmp(string);
+
+		erase(first, last);
+		insert(first, tmp.begin(), tmp.end());
+
+		return *this;
 	}
 
 	String::size_type String::rfind(const String& string, size_type pos) const
@@ -1175,7 +1194,7 @@ namespace U8
 			m_sharedString->refCount--;
 
 			pointer newBuffer = new value_type[capacity()];
-			std::copy(static_cast<const_pointer>(begin()), static_cast<const_pointer>(end()), newBuffer);
+			std::copy(data(), data() + capacity(), newBuffer);
 
 			m_sharedString = new SharedString(1, capacity(), size(), newBuffer);
 		}

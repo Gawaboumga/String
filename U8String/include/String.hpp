@@ -205,7 +205,9 @@ namespace U8
 			std::basic_string<char> raw_character(size_type pos) const;
 			void reserve(size_type bufferSize = 0);
 			void resize(size_type count, const Character& character = Character());
-			void replace(size_type pos, size_type count, const Character& character);
+			String& replace(size_type pos, size_type count, const String& string);
+			String& replace(size_type pos, size_type count, const Character& character);
+			String& replace(const_iterator first, const_iterator last, const String& string);
 			size_type rfind(const String& string, size_type pos = npos) const;
 			size_type rfind(const char* string, size_type pos = npos) const;
 			size_type rfind(const Character& character, size_type pos = npos) const;

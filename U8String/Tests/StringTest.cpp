@@ -398,12 +398,26 @@ SCENARIO("String", "[CORE]")
 			randomString = u8"Tést";
 
 			randomString.replace(0, 5, Character('u'));
+
 			THEN("Should be good")
 			{
 
 				REQUIRE(randomString.capacity() >= 10);
 				REQUIRE(randomString.size() == 8);
 				REQUIRE(randomString == u8"uuuuuést");
+
+			}
+
+		}
+
+		WHEN("We replace és by 'igh'")
+		{
+			randomString.replace(1, 2, String(u8"igh"));
+
+			THEN("We are supposed to get Tight")
+			{
+
+				REQUIRE(randomString == u8"Tight");
 
 			}
 
