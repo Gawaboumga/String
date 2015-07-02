@@ -144,6 +144,7 @@ namespace U8
 			void clear(bool keepBuffer = true);
 			uint32_t code_point(size_type pos) const;
 			int compare(const String& other, const std::locale& locale = std::locale()) const;
+			int compare(const char* other, const std::locale& locale = std::locale()) const;
 			size_type copy(char* dest, size_type count, size_type pos = 0) const;
 
 			const char* data() const;
@@ -195,8 +196,8 @@ namespace U8
 
 			friend String operator+(const String& lhs, const String& rhs);
 
-			String& operator+=(const char* string);
 			String& operator+=(const String& other);
+			String& operator+=(const char* string);
 			String& operator+=(const Character& other);
 
 			void pop_back();

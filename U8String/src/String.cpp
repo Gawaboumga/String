@@ -485,6 +485,14 @@ namespace U8
 		return *it;
 	}
 
+	int String::compare(const char* other, const std::locale& locale) const
+	{
+		auto& f = std::use_facet<std::collate<char>>(locale);
+		std::basic_string<char> s1(data()), s2(other);
+		return f.compare(s1.data(), s1.data() + s1.size(),
+			s2.data(), s2.data() + s2.size());
+	}
+
 	int String::compare(const String& other, const std::locale& locale) const
 	{
 		auto& f = std::use_facet<std::collate<char>>(locale);
@@ -889,14 +897,14 @@ namespace U8
 		return { pos, this };
 	}
 
-	String& String::operator+=(const char* other)
+	String& String::operator+=(const String& other)
 	{
 		append(other);
 
 		return *this;
 	}
 
-	String& String::operator+=(const String& other)
+	String& String::operator+=(const char* other)
 	{
 		append(other);
 
