@@ -719,6 +719,43 @@ namespace U8
 		return find_last_not_of(String(string), pos);
 	}
 
+	String String::fromUTF16(const char16_t* character)
+	{
+		const auto size = std::char_traits<char16_t>::length(character);
+		String tmp;
+		tmp.reserve(size * 2 + 1);
+		auto end = utf8::utf16to8(character, character + size, tmp.raw_buffer());
+		*end = '\0';
+		auto p = utf8::distance(tmp.data(), tmp.data() + std::distance(tmp.raw_buffer(), end));
+		tmp.m_sharedString->size = p;
+
+		return tmp;
+	}
+
+	String String::fromUTF32(const char32_t* character)
+	{
+		const auto size = std::char_traits<char32_t>::length(character);
+		String tmp;
+		tmp.reserve(2 * size + 1);
+		auto end = utf8::utf32to8(character, character + size, tmp.raw_buffer());
+		*end = '\0';
+		auto p = utf8::distance(tmp.data(), tmp.data() + std::distance(tmp.raw_buffer(), end));
+		tmp.m_sharedString->size = p;
+
+		return tmp;
+	}
+
+	String String::fromWide(const wchar_t* character, const std::locale& locale)
+	{
+		/*typedef std::codecvt_utf8<wchar_t> convert_wide_to_utf8;
+		std::wstring_convert<convert_wide_to_utf8, wchar_t> converterWUTF8;
+
+		return converterWUTF8.to_bytes(character);*/
+
+		assert(false);
+		return "";
+	}
+
 	Character String::front()
 	{
 		return { 0, this };

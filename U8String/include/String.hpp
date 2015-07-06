@@ -165,6 +165,9 @@ namespace U8
 			size_type find_last_of(const char* string, size_type pos = npos) const;
 			size_type find_last_not_of(const String& str, size_type pos = npos) const;
 			size_type find_last_not_of(const char* string, size_type pos = npos) const;
+			static String fromUTF16(const char16_t* character);
+			static String fromUTF32(const char32_t* character);
+			static String fromWide(const wchar_t* character, const std::locale& locale = std::locale());
 			Character front();
 			const Character front() const;
 
@@ -221,6 +224,12 @@ namespace U8
 			String tolower(const std::locale& locale = std::locale()) const;
 			String totitlecase(const std::locale& locale = std::locale()) const;
 			String toupper(const std::locale& locale = std::locale()) const;
+			template <class OutputIterator>
+			void toUTF16(OutputIterator result) const;
+			template <class OutputIterator>
+			void toUTF32(OutputIterator result) const;
+			template <class OutputIterator>
+			void toWide(OutputIterator result, const std::locale& locale = std::locale()) const;
 
 			static const size_type npos;
 

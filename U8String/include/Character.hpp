@@ -45,6 +45,10 @@ namespace U8
 
 			UnicodeData::BidirectionalCategory direction() const;
 
+			static Character fromUTF16(const char16_t character[3]);
+			static Character fromUTF32(const char32_t character[2]);
+			static Character fromWide(const wchar_t* character, const std::locale& locale = std::locale());
+
 			bool has_mirrored() const;
 
 			bool isalnum(const std::locale& locale = std::locale()) const;
@@ -75,12 +79,14 @@ namespace U8
 			Character tolower(const std::locale& locale = std::locale()) const;
 			Character totitlecase(const std::locale& locale = std::locale()) const;
 			Character toupper(const std::locale& locale = std::locale()) const;
+			template <class OutputIterator>
+			void toUTF16(OutputIterator result) const;
+			template <class OutputIterator>
+			void toUTF32(OutputIterator result) const;
+			template <class OutputIterator>
+			void toWide(OutputIterator result, const std::locale& locale = std::locale()) const;
 
 			friend std::istream& operator>>(std::istream& is, Character& character);
-
-			static Character fromUTF16(const char16_t character[3]);
-			static Character fromUTF32(const char32_t character[2]);
-			static Character fromWide(const wchar_t* character, const std::locale& locale = std::locale());
 
 		private:
 
@@ -110,5 +116,7 @@ namespace U8
 	std::istream& operator>>(std::istream& is, Character& character);
 
 } // U8
+
+#include <Character.inl>
 
 #endif // __CHARACTER_HPP__

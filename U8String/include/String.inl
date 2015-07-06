@@ -117,4 +117,29 @@ namespace U8
 		}
 	}
 
+	template <class OutputIterator>
+	void String::toUTF16(OutputIterator result) const
+	{
+		utf8::utf8to16(data(), data() + raw_size(), result);
+	}
+
+	template <class OutputIterator>
+	void String::toUTF32(OutputIterator result) const
+	{
+		utf8::utf8to32(data(), data() + raw_size(), result);
+	}
+
+	template <class OutputIterator>
+	void String::toWide(OutputIterator result, const std::locale& locale) const
+	{
+		/*std::mbstate_t mb = std::mbstate_t();
+		std::wstring_convert<std::codecvt<char, wchar_t, std::mbstate_t>(locale)> wideConv;
+		std::wstring tmp = wideConv.from_bytes(byte);
+		for (auto c : tmp)
+		{
+			*result = c;
+			++result;
+		}*/
+	}
+
 } // U8

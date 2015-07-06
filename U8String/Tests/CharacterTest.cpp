@@ -194,6 +194,37 @@ SCENARIO("Character", "[CORE]")
 
 		}
 
+		WHEN("We convert to different unicode")
+		{
+
+			THEN("They must be equal to utf8")
+			{
+
+				std::u16string tmp16;
+				e.toUTF16(std::back_inserter(tmp16));
+				REQUIRE(tmp16 == u"é");
+				std::u32string tmp32;
+				e.toUTF32(std::back_inserter(tmp32));
+				REQUIRE(tmp32 == U"é");
+				/*std::wstring tmpW;
+				e.toWide(std::back_inserter(tmpW));
+				REQUIRE(tmpW == L"é");*/
+
+				Character Gclef(u8"\U0001D11E");
+				tmp16.clear();
+				Gclef.toUTF16(std::back_inserter(tmp16));
+				REQUIRE(tmp16 == u"\U0001D11E");
+				tmp32.clear();
+				Gclef.toUTF32(std::back_inserter(tmp32));
+				REQUIRE(tmp32 == U"\U0001D11E");
+				/*tmpW.clear();
+				Gclef.toWide(std::back_inserter(tmpW));
+				REQUIRE(tmpW == L"\U0001D11E");*/
+
+			}
+
+		}
+
 		WHEN("We ask for character information")
 		{
 

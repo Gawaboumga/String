@@ -1072,4 +1072,46 @@ SCENARIO("String", "[CORE]")
 
 	}
 
+	GIVEN("One random string")
+	{
+
+		String randomString(u8"The clef \U0001D11E is often used in music");
+
+		WHEN("We convert from different unicode")
+		{
+
+			THEN("They must be equal to utf8")
+			{
+
+				REQUIRE(randomString == String::fromUTF16(u"The clef \U0001D11E is often used in music"));
+				REQUIRE(randomString == String::fromUTF32(U"The clef \U0001D11E is often used in music"));
+				//REQUIRE(randomString == String::fromWide(L"The clef \U0001D11E is often used in music"));
+
+			}
+
+		}
+
+		WHEN("We convert to different unicode")
+		{
+
+			THEN("They must be equal to utf8")
+			{
+
+				std::u16string tmp16;
+				randomString.toUTF16(std::back_inserter(tmp16));
+				REQUIRE(tmp16 == u"The clef \U0001D11E is often used in music");
+				std::u32string tmp32;
+				randomString.toUTF32(std::back_inserter(tmp32));
+				REQUIRE(tmp32 == U"The clef \U0001D11E is often used in music");
+				/*std::wstring tmpW;
+				randomString.toWide(std::back_inserter(tmpW));
+				REQUIRE(tmpW == L"The clef \U0001D11E is often used in music");*/
+
+
+			}
+
+		}
+
+	}
+
 }
