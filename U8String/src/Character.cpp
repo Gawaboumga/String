@@ -352,28 +352,22 @@ namespace U8
 		return tmp;
 	}
 
-	Character Character::fromWide(const wchar_t* character, const std::locale& locale)
+	Character Character::fromWide(const wchar_t* /*character*/, const std::locale& /*locale*/)
 	{
 		/*typedef std::codecvt_utf8<wchar_t> convert_wide_to_utf8;
 		std::wstring_convert<convert_wide_to_utf8, wchar_t> converterWUTF8;
 
 		return converterWUTF8.to_bytes(character);*/
 
-		std::mbstate_t mb = std::mbstate_t();
-		auto& f = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(locale);
-		const wchar_t* from_next;
-		char* to_next;
-		Character tmp;
-		f.out(mb, character, &character[2], from_next,
-				  tmp.byte, &tmp.byte[4], to_next);
-
-		return tmp;
+		assert(false);
+		return "";
 	}
 
 	Character::Character(size_type position, const String* string) :
 		m_position(position), m_string(const_cast<String*>(string))
 	{
-		std::basic_string<char> tmp = string->raw_character(position);
+		std::basic_string<char> tmp;
+		string->raw_character(position, std::back_inserter(tmp));
 		unsigned int i = 0;
 		while (i < tmp.size())
 		{

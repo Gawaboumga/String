@@ -17,12 +17,11 @@ namespace U8
 	{
 	}
 
-	String::StringIterator::difference_type String::StringIterator::number_character(const StringIterator& rhs) const
+	String::const_pointer String::StringIterator::base() const
 	{
-		if (m_string != rhs.m_string)
-			throw std::logic_error("Iterators are not associated with the same string !");
-
-		return rhs.m_pos - m_pos;
+		const_pointer ptr = m_string->data();
+		utf8::advance(ptr, m_pos, m_string->data() + m_string->capacity());
+		return ptr;
 	}
 
 	String::StringIterator& String::StringIterator::operator++()
@@ -61,13 +60,6 @@ namespace U8
 	const Character String::StringIterator::operator*() const
 	{
 		return { m_pos, m_string };
-	}
-
-	String::StringIterator::operator const char* () const
-	{
-		const_pointer ptr = m_string->data();
-		utf8::advance(ptr, m_pos, m_string->data() + m_string->capacity());
-		return ptr;
 	}
 
 	bool String::StringIterator::operator==(const StringIterator& rhs) const
@@ -385,7 +377,7 @@ namespace U8
 
 	void String::assign(const_iterator first, const_iterator last)
 	{
-		assign(static_cast<const_pointer>(first), static_cast<const_pointer>(last));
+		assign(first.base(), last.base());
 	}
 
 	void String::assign(std::initializer_list<const char*> init)
@@ -514,12 +506,12 @@ namespace U8
 		{
 			auto tmp = it;
 			std::advance(tmp, count);
-			end = tmp;
+			end = tmp.base();
 		}
 		else
 			end = data() + capacity();
 
-		std::copy(static_cast<const_pointer>(it), end - 1, dest);
+		std::copy(it.base(), end - 1, dest);
 
 		return std::min(count, size());
 	}
@@ -565,8 +557,8 @@ namespace U8
 		auto lengthBeginning = std::distance(begin(), first);
 		auto length = std::distance(first, last);
 
-		pointer firstTmp = const_cast<pointer>(static_cast<const_pointer>(first));
-		pointer lastTmp = const_cast<pointer>(static_cast<const_pointer>(last));
+		pointer firstTmp = const_cast<pointer>(first.base());
+		pointer lastTmp = const_cast<pointer>(last.base());
 		std::rotate(firstTmp, lastTmp, &raw_buffer()[capacity()]);
 
 		m_sharedString->buffer[capacity() - 1] = '\0';
@@ -588,12 +580,12 @@ namespace U8
 		auto itBegin = begin();
 		std::advance(itBegin, pos);
 
-		auto tmp = std::search(static_cast<const_pointer>(itBegin), static_cast<const_pointer>(end()), string, string + std::strlen(string));
+		auto tmp = std::search(itBegin.base(), end().base(), string, string + std::strlen(string));
 
-		if (tmp == end())
+		if (tmp == end().base())
 			return npos;
 		else
-			return utf8::distance(static_cast<const_pointer>(begin()), tmp);
+			return utf8::distance(begin().base(), tmp);
 	}
 
 	String::size_type String::find(const Character& character, size_type pos) const
@@ -601,7 +593,7 @@ namespace U8
 		auto itBegin = begin();
 		std::advance(itBegin, pos);
 		auto it = std::find(itBegin, end(), character);
-		return itBegin.number_character(it);
+		return std::distance(itBegin, it);
 	}
 
 	String::size_type String::find_first_of(const String& str, size_type pos) const
@@ -617,12 +609,12 @@ namespace U8
 		auto itBegin = begin();
 		std::advance(itBegin, pos);
 
-		auto tmp = std::find_first_of(static_cast<const_pointer>(itBegin), static_cast<const_pointer>(end()), string, string + std::strlen(string));
+		auto tmp = std::find_first_of(itBegin.base(), end().base(), string, string + std::strlen(string));
 
-		if (tmp == end())
+		if (tmp == end().base())
 			return npos;
 		else
-			return utf8::distance(static_cast<const_pointer>(begin()), tmp);
+			return utf8::distance(begin().base(), tmp);
 	}
 
 	String::size_type String::find_first_not_of(const String& str, size_type pos) const
@@ -745,7 +737,7 @@ namespace U8
 		return tmp;
 	}
 
-	String String::fromWide(const wchar_t* character, const std::locale& locale)
+	String String::fromWide(const wchar_t* /*character*/, const std::locale& /*locale*/)
 	{
 		/*typedef std::codecvt_utf8<wchar_t> convert_wide_to_utf8;
 		std::wstring_convert<convert_wide_to_utf8, wchar_t> converterWUTF8;
@@ -804,7 +796,7 @@ namespace U8
 
 	String::iterator String::insert(const_iterator pos, size_type count, const Character& character)
 	{
-		auto offset = pos - data();
+		auto offset = pos.base() - data();
 		auto distance = count * character.number_byte();
 
 		if (empty())
@@ -826,7 +818,7 @@ namespace U8
 
 	String::iterator String::insert(const_iterator pos, std::initializer_list<Character> ilist)
 	{
-		auto offset = pos - data();
+		auto offset = pos.base() - data();
 		size_type sum = 0U;
 		for (const auto& ch : ilist)
 			sum += ch.number_byte();
@@ -965,24 +957,6 @@ namespace U8
 		insert(end(), character);
 	}
 
-	std::basic_string<char> String::raw_character(size_type pos) const
-	{
-		utf8::iterator<const char*> it(data(), data(), data() + capacity());
-
-		std::advance(it, pos);
-
-		auto tmp = it;
-		++it;
-
-		std::basic_string<char> st;
-		for (const char* iter = tmp.base(); iter != it.base(); ++iter)
-		{
-			st.push_back(*iter);
-		}
-
-		return st;
-	}
-
 	void String::reserve(size_type bufferSize)
 	{
 		size_type oldSize = size();
@@ -1037,10 +1011,10 @@ namespace U8
 		auto it = begin();
 		std::advance(it, pos);
 
-		pointer tmp = const_cast<pointer>(static_cast<const_pointer>(it));
+		pointer tmp = const_cast<pointer>(it.base());
 		++it;
 
-		size_type diff = it - tmp;
+		size_type diff = it.base() - tmp;
 		if (diff == count * character.number_byte())
 		{
 			if (empty())
@@ -1112,12 +1086,12 @@ namespace U8
 			std::advance(itEnd, pos);
 		}
 
-		auto tmp = std::find_end(static_cast<const_pointer>(begin()), static_cast<const_pointer>(itEnd), string, string + std::strlen(string));
+		auto tmp = std::find_end(begin().base(), itEnd.base(), string, string + std::strlen(string));
 
-		if (tmp == itEnd)
+		if (tmp == itEnd.base())
 			return npos;
 		else
-			return utf8::distance(static_cast<const_pointer>(begin()), tmp);
+			return utf8::distance(begin().base(), tmp);
 	}
 
 	String::size_type String::rfind(const Character& character, size_type pos) const
@@ -1131,9 +1105,7 @@ namespace U8
 		if (it == rend())
 			return npos;
 		else
-		{
-			return utf8::distance(data(), static_cast<const_pointer>(it));
-		}
+			return utf8::distance(data(), it.base());
 	}
 
 	void String::shrink_to_fit()

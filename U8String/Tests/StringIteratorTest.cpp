@@ -21,13 +21,13 @@ SCENARIO("StringIterator", "[CORE]")
 
 				auto it = randomString.begin();
 				REQUIRE(*it == u8"a");
-				REQUIRE(randomString.raw_character(0) == u8"a");
+				REQUIRE(randomString[0] == u8"a");
 				REQUIRE(*(++it) == u8"é");
-				REQUIRE(randomString.raw_character(1) == u8"é");
+				REQUIRE(randomString[1] == u8"é");
 				REQUIRE(*(++it) == u8"b");
-				REQUIRE(randomString.raw_character(2) == u8"b");
+				REQUIRE(randomString[2] == u8"b");
 				REQUIRE(*(++it) == u8"à");
-				REQUIRE(randomString.raw_character(3) == u8"à");
+				REQUIRE(randomString[3] == u8"à");
 				REQUIRE((++it) == randomString.end());
 
 			}
@@ -39,13 +39,13 @@ SCENARIO("StringIterator", "[CORE]")
 
 				auto itR = oppositeString.rbegin();
 				REQUIRE(*itR == u8"a");
-				REQUIRE(oppositeString.raw_character(3) == u8"a");
+				REQUIRE(oppositeString[3] == u8"a");
 				REQUIRE(*(++itR) == u8"é");
-				REQUIRE(oppositeString.raw_character(2) == u8"é");
+				REQUIRE(oppositeString[2] == u8"é");
 				REQUIRE(*(++itR) == u8"b");
-				REQUIRE(oppositeString.raw_character(1) == u8"b");
+				REQUIRE(oppositeString[1] == u8"b");
 				REQUIRE(*(++itR) == u8"à");
-				REQUIRE(oppositeString.raw_character(0) == u8"à");
+				REQUIRE(oppositeString[0] == u8"à");
 				assert((++itR) == oppositeString.rend());
 
 				auto it = randomString.begin();

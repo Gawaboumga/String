@@ -76,7 +76,7 @@ namespace U8
 
 		size_type distance = static_cast<size_type>(std::distance(first, last));
 
-		size_type offset = pos - data();
+		size_type offset = pos.base() - data();
 
 		if (first >= data() && last <= data() + capacity())
 		{
@@ -118,6 +118,20 @@ namespace U8
 	}
 
 	template <class OutputIterator>
+	void String::raw_character(size_type pos, OutputIterator result) const
+	{
+		utf8::iterator<const char*> it(data(), data(), data() + capacity());
+
+		std::advance(it, pos);
+
+		auto tmp = it;
+		++it;
+
+		for (const char* iter = tmp.base(); iter != it.base(); ++iter)
+			*result++ = *iter;
+	}
+
+	template <class OutputIterator>
 	void String::toUTF16(OutputIterator result) const
 	{
 		utf8::utf8to16(data(), data() + raw_size(), result);
@@ -140,6 +154,8 @@ namespace U8
 			*result = c;
 			++result;
 		}*/
+
+		assert(false);
 	}
 
 } // U8

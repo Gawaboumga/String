@@ -1,5 +1,7 @@
 #include <utf8.h>
 
+#include <cassert>
+
 namespace U8
 {
 
@@ -26,6 +28,8 @@ namespace U8
 			*result = c;
 			++result;
 		}*/
+
+		assert(false);
 	}
 
 } // U8

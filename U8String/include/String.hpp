@@ -43,11 +43,10 @@ namespace U8
 					StringIterator(const String* string, size_type pos);
 					~StringIterator();
 
-					difference_type number_character(const StringIterator& rhs) const;
+					const_pointer base() const;
 
 					Character operator*();
 					const Character operator*() const;
-					operator const char* () const;
 					StringIterator& operator=(const StringIterator& other) = default;
 
 					bool operator==(const StringIterator& rhs) const;
@@ -206,7 +205,8 @@ namespace U8
 			void pop_back();
 			void push_back(const Character& character);
 
-			std::basic_string<char> raw_character(size_type pos) const;
+			template <class OutputIterator>
+			void raw_character(size_type pos, OutputIterator result) const;
 			void reserve(size_type bufferSize = 0);
 			void resize(size_type count, const Character& character = Character());
 			String& replace(size_type pos, size_type count, const String& string);
