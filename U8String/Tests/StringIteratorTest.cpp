@@ -46,7 +46,7 @@ SCENARIO("StringIterator", "[CORE]")
 				REQUIRE(oppositeString[1] == u8"b");
 				REQUIRE(*(++itR) == u8"à");
 				REQUIRE(oppositeString[0] == u8"à");
-				assert((++itR) == oppositeString.rend());
+				REQUIRE((++itR) == oppositeString.rend());
 
 				auto it = randomString.begin();
 				for (auto itReverse = oppositeString.rbegin(); itReverse != oppositeString.rend(); ++itReverse, ++it)
@@ -63,6 +63,10 @@ SCENARIO("StringIterator", "[CORE]")
 				REQUIRE(*(it++) == u8"a");
 				REQUIRE(*(it--) == u8"é");
 
+				auto itR = randomString.rbegin();
+				REQUIRE(*(itR++) == u8"à");
+				REQUIRE(*(itR--) == u8"b");
+
 			}
 
 		}
@@ -76,13 +80,11 @@ SCENARIO("StringIterator", "[CORE]")
 				REQUIRE(randomString.begin() == randomString.begin());
 				REQUIRE(randomString.end() == randomString.end());
 				REQUIRE(randomString.rbegin() == --randomString.end());
-				assert(randomString.rend() == --randomString.begin());
-				//REQUIRE(randomString.rend() == --randomString.begin());
+				REQUIRE(--randomString.rend() == randomString.begin());
 				REQUIRE(randomString.cbegin() == randomString.begin());
 				REQUIRE(randomString.cend() == randomString.cend());
 				REQUIRE(randomString.crbegin() == --randomString.end());
-				assert(randomString.crend() == --randomString.begin());
-				//REQUIRE(randomString.crend() == --randomString.begin());
+				REQUIRE((randomString.crend().base() + 1) == randomString.begin().base());
 
 			}
 

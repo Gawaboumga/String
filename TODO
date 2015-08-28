@@ -1,10 +1,7 @@
 //- Find_last, ...
 //- inputIt
 //- Multi character mapping upper/lower
+- Add functionalities (STL -> replace + correct current implementation !, and maybe others ?)
 - Documentation
-- Add functionalities (STL -> replace, and maybe others ?)
-- Allocator
 - Regex
-- Capacity -> convert to pointer ?
-- SharedString -> convert to shared_ptr ?
 - Do a real presentation of the project

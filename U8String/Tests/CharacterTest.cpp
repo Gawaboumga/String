@@ -95,7 +95,7 @@ SCENARIO("Character", "[CORE]")
 				Character Swedish(u8"å");
 
 				REQUIRE(American.compare(Swedish, std::locale("C")) < 0);
-				REQUIRE(American.compare(Swedish, std::locale("sv_SE.utf8")) > 0); // sudo locale-gen sv_SE.utf8 or comment it :)
+				REQUIRE(American.compare(Swedish, std::locale("en_US.utf8")) > 0);
 
 			}
 

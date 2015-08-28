@@ -11,7 +11,11 @@
 namespace U8
 {
 
-	class String
+	template <typename Traits, class Allocator>
+	U8String<Traits, Allocator> operator+(const U8String<Traits, Allocator> & lhs, const U8String<Traits, Allocator>& rhs);
+
+	template <typename Traits = std::char_traits<char>, class Allocator = std::allocator<char>>
+	class U8String final : public Basic_String, private Traits, Allocator
 	{
 		template <class RandomIter>
 		using RequireRandomIter = typename std::enable_if<std::is_convertible<typename std::iterator_traits<RandomIter>::iterator_category, std::random_access_iterator_tag>::value>::type;
@@ -20,65 +24,75 @@ namespace U8
 
 		public:
 
-			typedef char value_type;
-			typedef value_type& reference;
-			typedef const value_type& const_reference;
-			typedef value_type* pointer;
-			typedef const value_type* const_pointer;
-			typedef std::size_t size_type;
-			typedef std::ptrdiff_t difference_type;
+			using traits_type = Traits;
+			using value_type = typename Traits::char_type;
+			using allocator_type = Allocator;
+			using size_type = typename std::allocator_traits<Allocator>::size_type;
+			using difference_type = typename std::allocator_traits<Allocator>::difference_type;
+			using reference = value_type&;
+			using const_reference = const value_type&;
+			using pointer = typename std::allocator_traits<Allocator>::pointer;
+			using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
 
-			class StringIterator
+			class U8StringIterator
 			{
 				public:
 
-					typedef String::value_type value_type;
-					typedef String::reference reference;
-					typedef String::pointer pointer;
-					typedef String::size_type size_type;
-					typedef String::difference_type difference_type;
+					typedef U8String::value_type value_type;
+					typedef U8String::reference reference;
+					typedef U8String::pointer pointer;
+					typedef U8String::size_type size_type;
+					typedef U8String::difference_type difference_type;
 					typedef std::bidirectional_iterator_tag iterator_category;
 
-					StringIterator(const StringIterator& other) = default;
-					StringIterator(const String* string, size_type pos);
-					~StringIterator();
+					U8StringIterator() = default;
+					U8StringIterator(const U8StringIterator& other) = default;
+					U8StringIterator(const Basic_String* string, const_pointer it);
+					~U8StringIterator();
 
 					const_pointer base() const;
 
 					Character operator*();
 					const Character operator*() const;
-					StringIterator& operator=(const StringIterator& other) = default;
+					U8StringIterator& operator=(const U8StringIterator& other) = default;
 
-					bool operator==(const StringIterator& rhs) const;
-					bool operator!=(const StringIterator& rhs) const;
+					bool operator==(const U8StringIterator& rhs) const;
+					bool operator!=(const U8StringIterator& rhs) const;
 
-					StringIterator& operator++();
-					StringIterator operator++(int);
-					StringIterator& operator--();
-					StringIterator operator--(int);
+					U8StringIterator& operator++();
+					U8StringIterator operator++(int);
+					U8StringIterator& operator--();
+					U8StringIterator operator--(int);
+
+					const Basic_String* string() const;
 
 				protected:
 
-					size_type m_pos;
-					const String* m_string;
+					const_pointer m_it;
+					const Basic_String* m_string;
 			};
 
-			class ReverseStringIterator : public StringIterator
+			class ReverseU8StringIterator : public U8StringIterator
 			{
 				public:
-					using StringIterator::StringIterator;
+					using U8StringIterator::U8StringIterator;
 
-					ReverseStringIterator& operator++();
-					ReverseStringIterator operator++(int);
-					ReverseStringIterator& operator--();
-					ReverseStringIterator operator--(int);
+					ReverseU8StringIterator& operator++();
+					ReverseU8StringIterator operator++(int);
+					ReverseU8StringIterator& operator--();
+					ReverseU8StringIterator operator--(int);
+
+				private:
+
+					using U8StringIterator::m_it;
+					using U8StringIterator::m_string;
 			};
 
 			// types:
-			typedef StringIterator iterator;
-			typedef const StringIterator const_iterator;
-			typedef ReverseStringIterator reverse_iterator;
-			typedef const ReverseStringIterator const_reverse_iterator;
+			using iterator = U8StringIterator;
+			using const_iterator = const U8StringIterator;
+			using reverse_iterator = ReverseU8StringIterator;
+			using const_reverse_iterator = const ReverseU8StringIterator;
 
 			// iterators:
 			iterator begin();
@@ -94,35 +108,37 @@ namespace U8
 			const_reverse_iterator crbegin() const;
 			const_reverse_iterator crend() const;
 
-			String();
-			String(char character);
-			String(const Character& character);
-			String(const std::vector<Character>& characters);
-			String(size_type rep, char character);
-			String(size_type rep, const Character& character);
-			String(const String& string, size_type pos, size_type count);
-			String(const char* string, size_type count);
-			String(const char* string);
+			U8String();
+			explicit U8String(const Allocator& alloc);
+			U8String(char character, const Allocator& alloc = Allocator());
+			U8String(const Character& character, const Allocator& alloc = Allocator());
+			U8String(const std::vector<Character>& characters, const Allocator& alloc = Allocator());
+			U8String(size_type rep, char character, const Allocator& alloc = Allocator());
+			U8String(size_type rep, const Character& character, const Allocator& alloc = Allocator());
+			U8String(const U8String& string, size_type pos, size_type count = npos, const Allocator& alloc = Allocator());
+			U8String(const char* string, size_type count, const Allocator& alloc = Allocator());
+			U8String(const char* string, const Allocator& alloc = Allocator());
 			template <typename InputIter, typename = RequireInputIter<InputIter>>
-			String(InputIter first, InputIter last);
-			String(const std::string& string);
-			String(const String& string);
-			String(String&& string) noexcept;
-			String(std::initializer_list<const char*> init);
-			String(std::initializer_list<Character> init);
-			String(std::initializer_list<char> init);
-			~String();
+			U8String(InputIter first, InputIter last, const Allocator& alloc = Allocator());
+			U8String(const std::string& string, const Allocator& alloc = Allocator());
+			U8String(const U8String& string, const Allocator& alloc = Allocator());
+			U8String(U8String&& string, const Allocator& alloc = Allocator());
+			U8String(std::initializer_list<const char*> init, const Allocator& alloc = Allocator());
+			U8String(std::initializer_list<Character> init, const Allocator& alloc = Allocator());
+			U8String(std::initializer_list<char> init, const Allocator& alloc = Allocator());
+			~U8String();
 
-			String& append(const Character& character);
-			String& append(const char* string);
-			String& append(const String& string);
+			U8String& append(const char character);
+			U8String& append(const Character& character);
+			U8String& append(const char* string);
+			U8String& append(const U8String& string);
 
 			void assign(const std::vector<Character>& characters);
 			void assign(size_type n, char character);
 			void assign(size_type n, const Character& character);
-			void assign(const String& string);
-			void assign(const String& string, size_type pos, size_type count = npos);
-			void assign(String&& string);
+			void assign(const U8String& string);
+			void assign(const U8String& string, size_type pos, size_type count = npos);
+			void assign(U8String&& string);
 			void assign(const char* string, size_type count);
 			void assign(const char* string);
 			void assign(const_iterator first, const_iterator last);
@@ -139,42 +155,43 @@ namespace U8
 			const Character back() const;
 
 			size_type capacity() const;
-			Character character_at(size_type pos) const;
 			void clear(bool keepBuffer = true);
 			uint32_t code_point(size_type pos) const;
-			int compare(const String& other, const std::locale& locale = std::locale()) const;
+			int compare(const U8String& other, const std::locale& locale = std::locale()) const;
 			int compare(const char* other, const std::locale& locale = std::locale()) const;
 			size_type copy(char* dest, size_type count, size_type pos = 0) const;
 
 			const char* data() const;
 
 			bool empty() const;
-			String& erase(size_type index = 0, size_type count = npos);
+			U8String& erase(size_type index = 0, size_type count = npos);
 			iterator erase(const_iterator position);
 			iterator erase(const_iterator first, const_iterator last);
 
-			size_type find(const String& str, size_type pos = 0) const;
+			size_type find(const U8String& str, size_type pos = 0) const;
 			size_type find(const char* string, size_type pos = 0) const;
 			size_type find(const Character& character, size_type pos = 0) const;
-			size_type find_first_of(const String& str, size_type pos = 0) const;
+			size_type find_first_of(const U8String& str, size_type pos = 0) const;
 			size_type find_first_of(const char* string, size_type pos = 0) const;
-			size_type find_first_not_of(const String& str, size_type pos = 0) const;
+			size_type find_first_not_of(const U8String& str, size_type pos = 0) const;
 			size_type find_first_not_of(const char* string, size_type pos = 0) const;
-			size_type find_last_of(const String& str, size_type pos = npos) const;
+			size_type find_last_of(const U8String& str, size_type pos = npos) const;
 			size_type find_last_of(const char* string, size_type pos = npos) const;
-			size_type find_last_not_of(const String& str, size_type pos = npos) const;
+			size_type find_last_not_of(const U8String& str, size_type pos = npos) const;
 			size_type find_last_not_of(const char* string, size_type pos = npos) const;
-			static String fromUTF16(const char16_t* character);
-			static String fromUTF32(const char32_t* character);
-			static String fromWide(const wchar_t* character, const std::locale& locale = std::locale());
+			static U8String fromUTF16(const char16_t* character);
+			static U8String fromUTF32(const char32_t* character);
+			static U8String fromWide(const wchar_t* character);
 			Character front();
 			const Character front() const;
 
-			String& insert(size_type index, size_type count, char character);
-			String& insert(size_type index, size_type count, const Character& character);
-			String& insert(size_type index, const String& string, size_type subpos, size_type sublen = npos);
-			String& insert(size_type index, const String& string);
-			String& insert(size_type index, const char* string);
+			allocator_type get_allocator() const;
+
+			U8String& insert(size_type index, size_type count, char character);
+			U8String& insert(size_type index, size_type count, const Character& character);
+			U8String& insert(size_type index, const U8String& string, size_type subpos, size_type sublen = npos);
+			U8String& insert(size_type index, const U8String& string);
+			U8String& insert(size_type index, const char* string);
 			iterator insert(const_iterator pos, const Character& character);
 			iterator insert(const_iterator pos, size_type count, const Character& character);
 			template <typename InputIter, typename = RequireInputIter<InputIter>>
@@ -183,24 +200,26 @@ namespace U8
 
 			size_type max_size() const;
 
-			String& operator=(const std::vector<Character>& characters);
-			String& operator=(const String& other);
-			String& operator=(String&& other) noexcept;
-			String& operator=(const char* string);
-			String& operator=(char character);
-			String& operator=(const Character& character);
-			String& operator=(std::initializer_list<const char*> init);
-			String& operator=(std::initializer_list<Character> init);
-			String& operator=(std::initializer_list<char> init);
+			operator const char*() const;
+
+			U8String& operator=(const std::vector<Character>& characters);
+			U8String& operator=(const U8String& other);
+			U8String& operator=(U8String&& other) noexcept;
+			U8String& operator=(const char* string);
+			U8String& operator=(char character);
+			U8String& operator=(const Character& character);
+			U8String& operator=(std::initializer_list<const char*> init);
+			U8String& operator=(std::initializer_list<Character> init);
+			U8String& operator=(std::initializer_list<char> init);
 
 			Character operator[](size_type pos);
 			const Character operator[](size_type pos) const;
 
-			friend String operator+(const String& lhs, const String& rhs);
+			friend U8String operator+<>(const U8String& lhs, const U8String& rhs);
 
-			String& operator+=(const String& other);
-			String& operator+=(const char* string);
-			String& operator+=(const Character& other);
+			U8String& operator+=(const U8String& other);
+			U8String& operator+=(const char* string);
+			U8String& operator+=(const Character& other);
 
 			void pop_back();
 			void push_back(const Character& character);
@@ -209,99 +228,118 @@ namespace U8
 			void raw_character(size_type pos, OutputIterator result) const;
 			void reserve(size_type bufferSize = 0);
 			void resize(size_type count, const Character& character = Character());
-			String& replace(size_type pos, size_type count, const String& string);
-			String& replace(size_type pos, size_type count, const Character& character);
-			String& replace(const_iterator first, const_iterator last, const String& string);
-			size_type rfind(const String& string, size_type pos = npos) const;
+			U8String& replace(size_type pos, size_type count, const U8String& string);
+			U8String& replace(const_iterator first, const_iterator last, const U8String& string);
+			size_type rfind(const U8String& string, size_type pos = npos) const;
 			size_type rfind(const char* string, size_type pos = npos) const;
 			size_type rfind(const Character& character, size_type pos = npos) const;
 
 			void shrink_to_fit();
 			size_type size() const;
-			String substr(size_type pos = 0, size_type count = npos) const;
-			void swap(String& other);
+			U8String substr(size_type pos = 0, size_type count = npos) const;
+			void swap(U8String& other);
 
-			String tolower(const std::locale& locale = std::locale()) const;
-			String totitlecase(const std::locale& locale = std::locale()) const;
-			String toupper(const std::locale& locale = std::locale()) const;
+			U8String tolower(const std::locale& locale = std::locale()) const;
+			U8String totitlecase(const std::locale& locale = std::locale()) const;
+			U8String toupper(const std::locale& locale = std::locale()) const;
 			template <class OutputIterator>
 			void toUTF16(OutputIterator result) const;
 			template <class OutputIterator>
 			void toUTF32(OutputIterator result) const;
 			template <class OutputIterator>
-			void toWide(OutputIterator result, const std::locale& locale = std::locale()) const;
+			void toWide(OutputIterator result) const;
 
 			static const size_type npos;
 
+			size_type raw_size() const;
+
 		private:
-
-			struct SharedString
-			{
-				SharedString() :
-				capacity(0),
-				size(0),
-				buffer(nullptr),
-				refCount(1)
-				{
-				}
-
-				SharedString(unsigned short referenceCount, size_type bufferSize, size_type stringSize, value_type* str) :
-				capacity(bufferSize),
-				size(stringSize),
-				buffer(str),
-				refCount(referenceCount)
-				{
-				}
-
-				size_type capacity;
-				size_type size;
-				value_type* buffer;
-
-				std::atomic_ushort refCount;
-			};
 
 			template <typename InputIter>
 			void assign(InputIter first, InputIter last, std::input_iterator_tag);
 			template <typename RandomIter>
 			void assign(RandomIter first, RandomIter last, std::random_access_iterator_tag);
 
-			void ensure_ownership();
+			const_pointer end_string() const;
 
+			const_pointer get_pointer_character(size_type pos) const;
+
+			void initialize(size_type newSize, size_type endString);
+			void initialize_sso(size_type newSize, size_type endString);
+			void initialize_non_sso(size_type newSize, size_type endString);
 			template <typename InputIter>
 			iterator insert(const_iterator pos, InputIter first, InputIter last, std::input_iterator_tag);
 			template <typename RandomIter>
 			iterator insert(const_iterator pos, RandomIter first, RandomIter last, std::random_access_iterator_tag);
+			void invariant() const;
+			bool is_sso() const;
+
+			size_type MASK() const;
 
 			pointer raw_buffer();
-			size_type raw_size() const;
-			void release_string();
-			void right_shift(size_type pos, size_type length, size_type end);
+			U8String& replace(const_pointer& offsetPointer, const Character& character);
 
-			SharedString* m_sharedString;
+			union Data
+			{
+				struct NonSSO
+				{
+					char* ptr;
+					std::size_t capacity;
+					std::size_t end_string;
+					std::size_t size;
+				} non_sso;
+				struct SSO
+				{
+					char string[sizeof(NonSSO) / sizeof(char) - 2];
+					char end_string;
+					char size;
+				} sso;
+			} m_data;
 
-			static SharedString emptyString;
+			static std::size_t const sso_capacity = sizeof(typename Data::NonSSO) / sizeof(char) - 2;
+
 	};
 
-	bool operator==(const String& lhs, const String& rhs);
-	bool operator!=(const String& lhs, const String& rhs);
+	template <typename Traits, class Allocator>
+	bool operator==(const U8String<Traits, Allocator>& lhs, const U8String<Traits, Allocator>& rhs);
+	template <typename Traits, class Allocator>
+	bool operator==(const char* lhs, const U8String<Traits, Allocator>& rhs);
+	template <typename Traits, class Allocator>
+	bool operator==(const U8String<Traits, Allocator>& lhs, const char* rhs);
+	template <typename Traits, class Allocator>
+	bool operator!=(const U8String<Traits, Allocator>& lhs, const U8String<Traits, Allocator>& rhs);
+	template <typename Traits, class Allocator>
+	bool operator!=(const char* lhs, const U8String<Traits, Allocator>& rhs);
+	template <typename Traits, class Allocator>
+	bool operator!=(const U8String<Traits, Allocator>& lhs, const char* rhs);
 
-	bool operator<(const String& lhs, const String& rhs);
-	bool operator<=(const String& lhs, const String& rhs);
-	bool operator>(const String& lhs, const String& rhs);
-	bool operator>=(const String& lhs, const String& rhs);
+	template <typename Traits, class Allocator>
+	bool operator<(const U8String<Traits, Allocator>& lhs, const U8String<Traits, Allocator>& rhs);
+	template <typename Traits, class Allocator>
+	bool operator<=(const U8String<Traits, Allocator>& lhs, const U8String<Traits, Allocator>& rhs);
+	template <typename Traits, class Allocator>
+	bool operator>(const U8String<Traits, Allocator>& lhs, const U8String<Traits, Allocator>& rhs);
+	template <typename Traits, class Allocator>
+	bool operator>=(const U8String<Traits, Allocator>& lhs, const U8String<Traits, Allocator>& rhs);
 
-	std::istream& operator>>(std::istream& is, String& str);
-	std::ostream& operator<<(std::ostream& os, const String& str);
+	template <typename Traits, class Allocator>
+	std::istream& operator>>(std::istream& is, U8String<Traits, Allocator>& str);
+	template <typename Traits, class Allocator>
+	std::ostream& operator<<(std::ostream& os, const U8String<Traits, Allocator>& str);
+
+	typedef U8String<> String;
 
 } // U8
 
 namespace std
 {
 
-	void swap(U8::String& lhs, U8::String& rhs);
+	template <typename Traits, class Allocator>
+	void swap(U8::U8String<Traits, Allocator>& lhs, U8::U8String<Traits, Allocator>& rhs);
 
 } // std
 
 #include <String.inl>
+#include <STLAlgoString.inl>
 
 #endif // __STRING_HPP__

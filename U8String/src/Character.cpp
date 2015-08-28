@@ -1,35 +1,28 @@
 #include <Character.hpp>
 
-#include <String.hpp>
-
-#include <utf8.h>
-
-#include <cassert>
-#include <cstring>
-
 namespace U8
 {
 
 	Character::Character() :
-		m_position(0), m_string(nullptr)
+		m_string(nullptr)
 	{
 		byte[0] = '\0';
 	}
 
 	Character::Character(char character) :
-		m_position(0), m_string(nullptr)
+		m_string(nullptr)
 	{
 		assign(character);
 	}
 
 	Character::Character(const char* character) :
-		m_position(0), m_string(nullptr)
+		m_string(nullptr)
 	{
 		assign(character);
 	}
 
 	Character::Character(const Character& character) :
-		m_position(0), m_string(nullptr)
+		m_string(nullptr)
 	{
 		assign(character);
 	}
@@ -43,8 +36,7 @@ namespace U8
 		byte[0] = character;
 		byte[1] = '\0';
 
-		if (m_string)
-			m_string->replace(m_position, 1, *this);
+		replace();
 	}
 
 	void Character::assign(const char* character)
@@ -62,16 +54,15 @@ namespace U8
 		if (i < 4)
 			byte[i] = '\0';
 
-		if (m_string)
-			m_string->replace(m_position, 1, *this);
+		replace();
 	}
 
 	void Character::assign(const Character& character)
 	{
-		std::copy(character.byte, character.byte + 4, byte);
+		for (unsigned int i = 0; i < 4; ++i)
+			byte[i] = character.byte[i];
 
-		if (m_string)
-			m_string->replace(m_position, 1, *this);
+		replace();
 	}
 
 	UnicodeData::GeneralCategory Character::category() const
@@ -211,8 +202,7 @@ namespace U8
 	{
 		std::move(character.byte, character.byte + 4, byte);
 
-		if (m_string)
-			m_string->replace(m_position, 1, *this);
+		replace();
 
 		return *this;
 	}
@@ -363,22 +353,18 @@ namespace U8
 		return "";
 	}
 
-	Character::Character(size_type position, const String* string) :
-		m_position(position), m_string(const_cast<String*>(string))
+	Character::Character(const_pointer* offset, uint32_t code_point, const Basic_String* string) :
+		m_isPointer(true), m_string(const_cast<Basic_String*>(string))
 	{
-		std::basic_string<char> tmp;
-		string->raw_character(position, std::back_inserter(tmp));
-		unsigned int i = 0;
-		while (i < tmp.size())
-		{
-			byte[i] = tmp[i];
-			++i;
-		}
+		m_offset.m_offsetPointer = offset;
+		fromCodePoint(code_point);
+	}
 
-		if (i < 4U)
-		{
-			byte[i] = '\0';
-		}
+	Character::Character(const_pointer offset, uint32_t code_point, const Basic_String* string) :
+		m_isPointer(false), m_string(const_cast<Basic_String*>(string))
+	{
+		m_offset.m_offset = offset;
+		fromCodePoint(code_point);
 	}
 
 	std::vector<Character> Character::convert_multi_unicodes(const std::array<UnicodeData::Unicode, 3>& unicodes) const
@@ -397,18 +383,24 @@ namespace U8
 		return tmpReturn;
 	}
 
+	void Character::replace()
+	{
+		if (m_string)
+		{
+			if (m_isPointer)
+				m_string->replace(*m_offset.m_offsetPointer, *this);
+			else
+			{
+				m_string->replace(m_offset.m_offset, *this);
+			}
+		}
+	}
+
 	void Character::fromCodePoint(UnicodeData::Unicode codePoint)
 	{
 		char* end = utf8::append(codePoint, byte);
 		if (end != byte + 4)
 			*end = '\0';
-	}
-
-	char Character::operator[](unsigned char pos) const
-	{
-		assert(pos < 4);
-
-		return byte[pos];
 	}
 
 	bool operator==(const Character& lhs, const Character& rhs)

@@ -8,14 +8,41 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+
 namespace U8
 {
 
-	class String;
+	class Character;
+
+	template <typename Traits, class Allocator>
+	class U8String;
+
+	class Basic_String
+	{
+		public:
+			typedef char value_type;
+			typedef value_type& reference;
+			typedef const value_type& const_reference;
+			typedef value_type* pointer;
+			typedef const value_type* const_pointer;
+			typedef std::size_t size_type;
+			typedef std::ptrdiff_t difference_type;
+
+			virtual const_pointer data() const = 0;
+
+			virtual const_pointer end_string() const = 0;
+
+			virtual size_type raw_size() const = 0;
+
+			virtual Basic_String& replace(const_pointer& offset, const Character& character) = 0;
+	};
 
 	class Character
 	{
-		friend class String;
+
+		template <typename Traits, class Allocator>
+		friend class U8String;
 
 		typedef char value_type;
 		typedef value_type& reference;
@@ -90,17 +117,23 @@ namespace U8
 
 		private:
 
-			Character(size_type position, const String* string);
+			Character(const_pointer* offset, uint32_t code_point, const Basic_String* string);
+			Character(const_pointer offset, uint32_t code_point, const Basic_String* string);
 
 			std::vector<Character> convert_multi_unicodes(const std::array<UnicodeData::Unicode, 3>& unicodes) const;
 
 			void fromCodePoint(UnicodeData::Unicode codePoint);
 
-			char operator[](unsigned char pos) const;
+			void replace();
 
 			char byte[4];
-			size_type m_position;
-			String* m_string;
+			bool m_isPointer;
+			union Offset
+			{
+				const_pointer* m_offsetPointer;
+				const_pointer m_offset;
+			} m_offset;
+			Basic_String* m_string;
 	};
 
 
