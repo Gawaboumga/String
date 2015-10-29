@@ -11,7 +11,7 @@ namespace U8
 {
 
 	template <typename Traits, class Allocator>
-	U8String<Traits, Allocator>::U8StringIterator::U8StringIterator(const Basic_String* string, const_pointer it) :
+	U8String<Traits, Allocator>::U8StringIterator::U8StringIterator(const U8String* string, const_pointer it) :
 		m_it(it), m_string(string)
 	{
 	}
@@ -60,7 +60,7 @@ namespace U8
 	}
 
 	template <typename Traits, class Allocator>
-	const Basic_String* U8String<Traits, Allocator>::U8StringIterator::string() const
+	const U8String<Traits, Allocator>* U8String<Traits, Allocator>::U8StringIterator::string() const
 	{
 		return m_string;
 	}
@@ -720,6 +720,7 @@ namespace U8
 	{
 		assert(first.string() == lastIt.string());
 		assert(first.base() >= data() && first.base() <= end_string());
+		assert(first.base() <= lastIt.base());
 
 		iterator last = lastIt;
 

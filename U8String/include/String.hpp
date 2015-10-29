@@ -47,7 +47,7 @@ namespace U8
 
 					U8StringIterator() = default;
 					U8StringIterator(const U8StringIterator& other) = default;
-					U8StringIterator(const Basic_String* string, const_pointer it);
+					U8StringIterator(const U8String* string, const_pointer it);
 					~U8StringIterator();
 
 					const_pointer base() const;
@@ -64,12 +64,12 @@ namespace U8
 					U8StringIterator& operator--();
 					U8StringIterator operator--(int);
 
-					const Basic_String* string() const;
+					const U8String* string() const;
 
 				protected:
 
 					const_pointer m_it;
-					const Basic_String* m_string;
+					const U8String* m_string;
 			};
 
 			class ReverseU8StringIterator : public U8StringIterator

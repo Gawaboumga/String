@@ -978,9 +978,7 @@ SCENARIO("String", "[CORE]")
 
 				REQUIRE(std::count(randomString.begin(), randomString.end(), u8"à") == 2);
 
-                auto it = U8::remove_if(randomString.begin(), randomString.end(), [](const Character& x) {
-					return x == 'o';
-				});
+                auto it = U8::remove(randomString.begin(), randomString.end(), 'o');
 				randomString.erase(it, randomString.end());
 
 				REQUIRE(randomString == u8"hell wrld à tus et à tutes");
@@ -993,6 +991,14 @@ SCENARIO("String", "[CORE]")
 
 				REQUIRE(randomString == u8"hell wrld  tus et  tutes");
 				REQUIRE(randomString.raw_size() == 24);
+
+				it = U8::remove_if(randomString.begin(), --randomString.end(), [](const Character& x) {
+					return x == u8"s";
+				});
+				randomString.erase(it, --randomString.end());
+
+				REQUIRE(randomString == u8"hell wrld  tu et  tutes");
+				REQUIRE(randomString.raw_size() == 23);
 
 			}
 
