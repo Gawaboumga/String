@@ -22,126 +22,126 @@ SCENARIO("String", "[CORE]")
 				{
 					String emptyString;
 					REQUIRE(emptyString.empty());
-					REQUIRE(emptyString.capacity() == 0);
 					REQUIRE(emptyString.size() == 0);
+					REQUIRE(emptyString.raw_size() == 0);
 				}
 
 				{
 					String sizeTwoCapacityFour(u8"éà");
-					REQUIRE(sizeTwoCapacityFour.capacity() >= 4);
 					REQUIRE(sizeTwoCapacityFour.size() == 2);
 					REQUIRE(sizeTwoCapacityFour == u8"éà");
+					REQUIRE(sizeTwoCapacityFour.raw_size() == 4);
 				}
 
 				{
 					String oneChar('a');
-					REQUIRE(oneChar.capacity() >= 1);
 					REQUIRE(oneChar.size() == 1);
 					REQUIRE(oneChar == u8"a");
+					REQUIRE(oneChar.raw_size() == 1);
 				}
 
 				{
 					String oneChar(Character(u8"à"));
-					REQUIRE(oneChar.capacity() >= 2);
 					REQUIRE(oneChar.size() == 1);
 					REQUIRE(oneChar == u8"à");
+					REQUIRE(oneChar.raw_size() == 2);
 				}
 
 				{
 					String threeChar(3, 'a');
-					REQUIRE(threeChar.capacity() >= 3);
 					REQUIRE(threeChar.size() == 3);
 					REQUIRE(threeChar == u8"aaa");
+					REQUIRE(threeChar.raw_size() == 3);
 				}
 
 				{
 					String threeChar(3, Character(u8"à"));
-					REQUIRE(threeChar.capacity() >= 6);
 					REQUIRE(threeChar.size() == 3);
 					REQUIRE(threeChar == u8"ààà");
+					REQUIRE(threeChar.raw_size() == 6);
 				}
 
 				{
 					String sizeThreeCapacityFour(u8"Téste", 1, 3);
-					REQUIRE(sizeThreeCapacityFour.capacity() >= 4);
 					REQUIRE(sizeThreeCapacityFour.size() == 3);
 					REQUIRE(sizeThreeCapacityFour == u8"ést");
+					REQUIRE(sizeThreeCapacityFour.raw_size() == 4);
 				}
 
 
 				{
 					String sizeThreeCapacityFour(u8"Tést", 1, String::npos);
-					REQUIRE(sizeThreeCapacityFour.capacity() >= 4);
 					REQUIRE(sizeThreeCapacityFour.size() == 3);
 					REQUIRE(sizeThreeCapacityFour == u8"ést");
+					REQUIRE(sizeThreeCapacityFour.raw_size() == 4);
 				}
 
 				{
 					String sizeFourCapacityFour("Test");
-					REQUIRE(sizeFourCapacityFour.capacity() >= 4);
 					REQUIRE(sizeFourCapacityFour.size() == 4);
 					REQUIRE(sizeFourCapacityFour == u8"Test");
+					REQUIRE(sizeFourCapacityFour.raw_size() == 4);
 				}
 
 				{
 					String sizeThreeCapacityFour("Tça");
-					REQUIRE(sizeThreeCapacityFour.capacity() >= 4);
 					REQUIRE(sizeThreeCapacityFour.size() == 3);
 					REQUIRE(sizeThreeCapacityFour == u8"Tça");
+					REQUIRE(sizeThreeCapacityFour.raw_size() == 4);
 				}
 
 				{
 					std::string tmp("abc");
 					String sizeThreeCapacityThree(tmp.begin(), tmp.end());
-					REQUIRE(sizeThreeCapacityThree.capacity() >= 3);
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
 					REQUIRE(sizeThreeCapacityThree == u8"abc");
+					REQUIRE(sizeThreeCapacityThree.raw_size() == 3);
 				}
 
 				{
 					std::forward_list<Character> flist{ u8"é", u8"t", u8"à" };
 					String sizeThreeCapacityFive(flist.begin(), flist.end());
-					REQUIRE(sizeThreeCapacityFive.capacity() >= 5);
 					REQUIRE(sizeThreeCapacityFive.size() == 3);
 					REQUIRE(sizeThreeCapacityFive == u8"étà");
+					REQUIRE(sizeThreeCapacityFive.raw_size() == 5);
 				}
 
 				{
 					String sizeThreeCapacityThree(std::string("abc"));
-					REQUIRE(sizeThreeCapacityThree.capacity() >= 3);
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
 					REQUIRE(sizeThreeCapacityThree == u8"abc");
+					REQUIRE(sizeThreeCapacityThree.raw_size() == 3);
 				}
 
 				{
 					String sizeFourCapacityFive(String(u8"aébc"));
-					REQUIRE(sizeFourCapacityFive.capacity() >= 5);
 					REQUIRE(sizeFourCapacityFive.size() == 4);
 					REQUIRE(sizeFourCapacityFive == u8"aébc");
+					REQUIRE(sizeFourCapacityFive.raw_size() == 5);
 				}
 
 				{
 					String tmp(u8"aébc");
 					String sizeFourCapacityFive(std::move(tmp));
-					REQUIRE(sizeFourCapacityFive.capacity() >= 5);
 					REQUIRE(sizeFourCapacityFive.size() == 4);
 					REQUIRE(sizeFourCapacityFive == u8"aébc");
-					REQUIRE(tmp.capacity() == 0);
+					REQUIRE(sizeFourCapacityFive.raw_size() == 5);
 					REQUIRE(tmp.size() == 0);
+					REQUIRE(tmp.raw_size() == 0);
 				}
 
 				{
 					String sizeThreeCapacityThree({'a', 'b', 'c'});
-					REQUIRE(sizeThreeCapacityThree.capacity() >= 3);
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
 					REQUIRE(sizeThreeCapacityThree == u8"abc");
+					REQUIRE(sizeThreeCapacityThree.raw_size() == 3);
 				}
 
 				{
 					String sizeThreeCapacityThree({u8"à", u8"b", u8"c"});
-					REQUIRE(sizeThreeCapacityThree.capacity() >= 4);
 					REQUIRE(sizeThreeCapacityThree.size() == 3);
 					REQUIRE(sizeThreeCapacityThree == u8"àbc");
+					REQUIRE(sizeThreeCapacityThree.raw_size() == 4);
 				}
 
 			}
@@ -162,45 +162,44 @@ SCENARIO("String", "[CORE]")
 			{
 
 				emptyString = u8"éà";
-				REQUIRE(emptyString.capacity() >= 4);
 				REQUIRE(emptyString.size() == 2);
+				REQUIRE(emptyString.raw_size() == 4);
 
 				emptyString = u8"ç";
-				REQUIRE(emptyString.capacity() >= 4);
 				REQUIRE(emptyString.size() == 1);
+				REQUIRE(emptyString.raw_size() == 2);
 
 				emptyString = String(u8"çdvta");
-				REQUIRE(emptyString.capacity() >= 6);
 				REQUIRE(emptyString.size() == 5);
+				REQUIRE(emptyString.raw_size() == 6);
 
 				String tmp(u8"çdva");
 				emptyString = std::move(tmp);
-				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 4);
+				REQUIRE(emptyString.raw_size() == 5);
 
 				emptyString = "cava";
-				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 4);
+				REQUIRE(emptyString.raw_size() == 4);
 
 				emptyString = 'c';
-				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 1);
+				REQUIRE(emptyString.raw_size() == 1);
 
 				emptyString = Character(u8"à");
-				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 1);
+				REQUIRE(emptyString.raw_size() == 2);
 
 				emptyString = {'c', 'a'};
-				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 2);
+				REQUIRE(emptyString.raw_size() == 2);
 
 				emptyString = {u8"ç", u8"à", u8"v", u8"a"};
-				REQUIRE(emptyString.capacity() >= 6);
 				REQUIRE(emptyString.size() == 4);
+				REQUIRE(emptyString.raw_size() == 6);
 
 				emptyString = u8"étà";
 				emptyString.assign(emptyString.begin(), emptyString.end());
-				REQUIRE(emptyString.capacity() >= 5);
 				REQUIRE(emptyString.size() == 3);
 				REQUIRE(emptyString == u8"étà");
 
@@ -310,7 +309,8 @@ SCENARIO("String", "[CORE]")
 		WHEN("We assign the letter.")
 		{
 
-			randomString.at(2) = u8"l";
+			Character l(u8"l");
+			randomString.at(2).assign(l);
 
 			THEN("This is expected with the same size")
 			{
@@ -320,8 +320,13 @@ SCENARIO("String", "[CORE]")
 			}
 
 			REQUIRE(randomString == u8"Télt");
+			REQUIRE(randomString.raw_size() == 5);
 
 			randomString.at(1) = u8"j";
+
+			REQUIRE(randomString.raw_size() == 4);
+
+			REQUIRE(randomString == u8"Tjlt");
 
 			THEN("This is expected with smaller size")
 			{
@@ -341,7 +346,35 @@ SCENARIO("String", "[CORE]")
 
 			}
 
+			REQUIRE(randomString.raw_size() == 5);
+
 			REQUIRE(randomString == u8"Télt");
+
+			randomString.at(2) = u8"\U0001D11E";
+
+			THEN("This is expected with the same size")
+			{
+
+				REQUIRE(randomString.at(2) == u8"\U0001D11E");
+
+			}
+
+			REQUIRE(randomString == u8"Té\U0001D11Et");
+
+			REQUIRE(randomString.raw_size() == 8);
+
+			randomString.at(2) = u8"à";
+
+			THEN("This is expected with the same size")
+			{
+
+				REQUIRE(randomString.at(2) == u8"à");
+
+			}
+
+			REQUIRE(randomString == u8"Téàt");
+
+			REQUIRE(randomString.raw_size() == 6);
 
 		}
 
@@ -352,41 +385,38 @@ SCENARIO("String", "[CORE]")
 
 		String randomString(u8"Tést");
 
-		WHEN("We replace the é by two a")
+		WHEN("We replace the és by a")
 		{
 
-			auto oldCapacity = randomString.capacity();
-			auto oldSize = randomString.size();
-
-			randomString.replace(1, 2, Character(u8"a"));
+			randomString.replace(1, 2, u8"a");
 
 			THEN("Should be good")
 			{
 
-				REQUIRE(randomString == u8"Taast");
-				REQUIRE(randomString.capacity() == oldCapacity);
-				REQUIRE(randomString.size() == 5);
+				REQUIRE(randomString == u8"Tat");
+				REQUIRE(randomString.raw_size() == 3);
+				REQUIRE(randomString.size() == 3);
 
 			}
 
-			randomString.at(3) = u8"見";
+			randomString.at(2) = u8"見";
 
-			THEN("Replace the s by a japanese character")
+			THEN("Replace the t by a japanese character")
 			{
 
-				REQUIRE(randomString == u8"Taa見t");
-				REQUIRE(randomString.capacity() >= 7);
-				REQUIRE(randomString.size() == 5);
+				REQUIRE(randomString == u8"Ta見");
+				REQUIRE(randomString.raw_size() == 5);
+				REQUIRE(randomString.size() == 3);
 
 			}
 
-			randomString.replace(3, 2, Character('s'));
+			randomString.replace(1, 2, u8"hello");
 
-			THEN("Replace the japanese one by two s")
+			THEN("Replace the a & japanese one by hello")
 			{
 
-				REQUIRE(randomString == u8"Taasst");
-				REQUIRE(randomString.capacity() >= 7);
+				REQUIRE(randomString == u8"Thello");
+				REQUIRE(randomString.raw_size() == 6);
 				REQUIRE(randomString.size() == 6);
 
 			}
@@ -397,12 +427,12 @@ SCENARIO("String", "[CORE]")
 		{
 			randomString = u8"Tést";
 
-			randomString.replace(0, 5, Character('u'));
+			randomString.replace(0, 1, "uuuuu");
 
 			THEN("Should be good")
 			{
 
-				REQUIRE(randomString.capacity() >= 10);
+				REQUIRE(randomString.raw_size() == 9);
 				REQUIRE(randomString.size() == 8);
 				REQUIRE(randomString == u8"uuuuuést");
 
@@ -450,17 +480,23 @@ SCENARIO("String", "[CORE]")
 		WHEN("We shrink to fit")
 		{
 
-			REQUIRE(abe.capacity() >= 5);
-
 			THEN("We replace the é by one a and we shrink to fit")
 			{
 
 				auto oldCapacity = abe.capacity();
-				abe.replace(2, 1, Character(u8"a"));
+				abe.replace(2, 1, u8"a");
 				abe.shrink_to_fit();
-				REQUIRE(abe.capacity() >= 4);
-				REQUIRE(abe.capacity() < oldCapacity);
+				REQUIRE(abe.raw_size() == 4);
 				REQUIRE(abe == u8"àba");
+
+				String FiftyChar(50, 'c');
+				REQUIRE(FiftyChar.raw_size() == 50);
+				FiftyChar.erase(40, 10);
+				REQUIRE(FiftyChar.raw_size() == 40);
+				REQUIRE(FiftyChar.capacity() >= 50);
+				FiftyChar.shrink_to_fit();
+				REQUIRE(FiftyChar.raw_size() == 40);
+				REQUIRE(FiftyChar.capacity() == 40);
 
 			}
 
@@ -470,7 +506,7 @@ SCENARIO("String", "[CORE]")
 				abe = "";
 				abe.shrink_to_fit();
 				REQUIRE(abe == "");
-				REQUIRE(abe.capacity() == 0);
+				REQUIRE(abe.raw_size() == 0);
 				REQUIRE(abe.size() == 0);
 
 			}
@@ -480,8 +516,12 @@ SCENARIO("String", "[CORE]")
 
 				abe.resize(5, Character('a'));
 				REQUIRE(abe == u8"àbéaa");
+				REQUIRE(abe.raw_size() == 7);
+				REQUIRE(abe.size() == 5);
 				abe.resize(3);
 				REQUIRE(abe == u8"àbé");
+				REQUIRE(abe.raw_size() == 5);
+				REQUIRE(abe.size() == 3);
 
 			}
 
@@ -503,19 +543,19 @@ SCENARIO("String", "[CORE]")
 				emptyString.insert(0, u8"léa");
 
 				REQUIRE(emptyString == u8"léa");
-				REQUIRE(emptyString.capacity() >= 4);
+				REQUIRE(emptyString.raw_size() == 4);
 				REQUIRE(emptyString.size() == 3);
 
 				emptyString.insert(1, u8"çà");
 
 				REQUIRE(emptyString == u8"lçàéa");
-				REQUIRE(emptyString.capacity() >= 8);
+				REQUIRE(emptyString.raw_size() == 8);
 				REQUIRE(emptyString.size() == 5);
 
-				emptyString.insert(emptyString.size(), 3, Character(u8"o"));
+				emptyString.insert(emptyString.size(), 3, u8"o");
 
 				REQUIRE(emptyString == u8"lçàéaooo");
-				REQUIRE(emptyString.capacity() >= 11);
+				REQUIRE(emptyString.raw_size() == 11);
 				REQUIRE(emptyString.size() == 8);
 
 			}
@@ -527,7 +567,7 @@ SCENARIO("String", "[CORE]")
 
 				REQUIRE(it == emptyString.begin());
 				REQUIRE(emptyString == u8"çaé");
-				REQUIRE(emptyString.capacity() >= 5);
+				REQUIRE(emptyString.raw_size() == 5);
 				REQUIRE(emptyString.size() == 3);
 
 				it = emptyString.begin();
@@ -538,20 +578,20 @@ SCENARIO("String", "[CORE]")
 				std::advance(it, 3);
 				REQUIRE(it == tmp);
 				REQUIRE(emptyString == u8"çaé!!!");
-				REQUIRE(emptyString.capacity() >= 8);
+				REQUIRE(emptyString.raw_size() == 8);
 				REQUIRE(emptyString.size() == 6);
 
 				it = --emptyString.end();
 				tmp = emptyString.insert(it, 5, Character(u8"u"));
-				REQUIRE(emptyString.capacity() >= 13);
+				REQUIRE(emptyString.raw_size() == 13);
 				REQUIRE(emptyString.size() == 11);
 				REQUIRE(emptyString == u8"çaé!!uuuuu!");
 
 				std::forward_list<Character> flist({ u8"b", "ô" });
 				emptyString.insert(--emptyString.end(), flist.begin(), flist.end());
-				REQUIRE(emptyString.capacity() >= 16);
-				REQUIRE(emptyString.size() == 13);
 				REQUIRE(emptyString == u8"çaé!!uuuuubô!");
+				REQUIRE(emptyString.raw_size() == 16);
+				REQUIRE(emptyString.size() == 13);
 
 			}
 
@@ -572,15 +612,18 @@ SCENARIO("String", "[CORE]")
 
 				randomString.erase(4).erase(3);
 				REQUIRE(randomString == u8"hél");
+				REQUIRE(randomString.raw_size() == 4);
 				REQUIRE(randomString.size() == 3);
 
 				randomString.erase(1);
 				REQUIRE(randomString == u8"h");
+				REQUIRE(randomString.raw_size() == 1);
 				REQUIRE(randomString.size() == 1);
 
 				randomString = u8"hélto";
 				randomString.erase(1, 3);
 				REQUIRE(randomString == u8"ho");
+				REQUIRE(randomString.raw_size() == 2);
 				REQUIRE(randomString.size() == 2);
 
 			}
@@ -590,6 +633,7 @@ SCENARIO("String", "[CORE]")
 
 				auto it = randomString.erase(--randomString.end());
 				REQUIRE(randomString == u8"hélt");
+				REQUIRE(randomString.raw_size() == 5);
 				REQUIRE(randomString.size() == 4);
 				REQUIRE(it == randomString.end());
 
@@ -611,16 +655,32 @@ SCENARIO("String", "[CORE]")
 				String str(u8"This is an example sentence.");
 				str.erase(10, 8);
 				REQUIRE(str == u8"This is an sentence.");
+				REQUIRE(str.raw_size() == 20);
 				auto it = str.begin();
 				std::advance(it, 9);
 				str.erase(it);
 				REQUIRE(str == u8"This is a sentence.");
+				REQUIRE(str.raw_size() == 19);
 				auto itFirst = str.begin();
 				auto itEnd = str.begin();
 				std::advance(itFirst, 5);
 				std::advance(itEnd, str.size() - 9);
 				str.erase(itFirst, itEnd);
+
 				REQUIRE(str == u8"This sentence.");
+
+			}
+
+			THEN("With not SSO")
+			{
+
+				String str(u8"123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+				str.erase(str.begin(), ----str.end());
+				REQUIRE(str == u8"YZ");
+				REQUIRE(str.raw_size() == 2);
+				str.insert(str.end(), 50, u8"b");
+				REQUIRE(str.raw_size() == 52);
+				REQUIRE(str.capacity() == 52);
 
 			}
 
@@ -641,27 +701,27 @@ SCENARIO("String", "[CORE]")
 
 				randomString.push_back(u8"à");
 				REQUIRE(randomString == u8"Hélloà");
-				REQUIRE(randomString.capacity() >= 8);
+				REQUIRE(randomString.raw_size() == 8);
 				REQUIRE(randomString.size() == 6);
 
 				randomString.pop_back();
 				REQUIRE(randomString == u8"Héllo");
-				REQUIRE(randomString.capacity() >= 8);
+				REQUIRE(randomString.raw_size() == 6);
 				REQUIRE(randomString.size() == 5);
 
 				randomString.append(u8"à");
 				REQUIRE(randomString == u8"Hélloà");
-				REQUIRE(randomString.capacity() >= 8);
+				REQUIRE(randomString.raw_size() == 8);
 				REQUIRE(randomString.size() == 6);
 
 				randomString.append(u8"blabla");
 				REQUIRE(randomString == u8"Hélloàblabla");
-				REQUIRE(randomString.capacity() >= 14);
+				REQUIRE(randomString.raw_size() == 14);
 				REQUIRE(randomString.size() == 12);
 
 				randomString.append(String(u8"Test"));
 				REQUIRE(randomString == u8"HélloàblablaTest");
-				REQUIRE(randomString.capacity() >= 18);
+				REQUIRE(randomString.raw_size() == 18);
 				REQUIRE(randomString.size() == 16);
 
 			}
@@ -695,7 +755,8 @@ SCENARIO("String", "[CORE]")
 				pos = randomString.find_first_of(String(u8"abcde"));
 				REQUIRE(pos == 6);
 
-				pos = randomString.find_first_not_of(String(u8" éà à "));
+				String t(u8" éà à ");
+				pos = randomString.find_first_not_of(t);
 				REQUIRE(pos == 6);
 
 				pos = randomString.find_last_of(String(u8"abcde"), 10);
@@ -817,7 +878,8 @@ SCENARIO("String", "[CORE]")
 				REQUIRE(randomString == u8"hello hello ");
 
 				String helloWorld = String("hello") + String(" ") + String("world");
-				REQUIRE(helloWorld == "hello world");
+				REQUIRE(helloWorld == u8"hello world");
+				REQUIRE(helloWorld.raw_size() == 11);
 
 			}
 
@@ -916,17 +978,27 @@ SCENARIO("String", "[CORE]")
 
 				REQUIRE(std::count(randomString.begin(), randomString.end(), u8"à") == 2);
 
-				randomString.erase(std::remove_if(randomString.begin(), randomString.end(), [](const Character& x) {
-					return x == 'o';
-				}), randomString.end());
+                auto it = U8::remove(randomString.begin(), randomString.end(), 'o');
+				randomString.erase(it, randomString.end());
 
 				REQUIRE(randomString == u8"hell wrld à tus et à tutes");
+				REQUIRE(randomString.raw_size() == 28);
 
-				randomString.erase(std::remove_if(randomString.begin(), randomString.end(), [](const Character& x) {
+                it = U8::remove_if(randomString.begin(), randomString.end(), [](const Character& x) {
 					return x == u8"à";
-				}), randomString.end());
+				});
+				randomString.erase(it, randomString.end());
 
 				REQUIRE(randomString == u8"hell wrld  tus et  tutes");
+				REQUIRE(randomString.raw_size() == 24);
+
+				it = U8::remove_if(randomString.begin(), --randomString.end(), [](const Character& x) {
+					return x == u8"s";
+				});
+				randomString.erase(it, --randomString.end());
+
+				REQUIRE(randomString == u8"hell wrld  tu et  tutes");
+				REQUIRE(randomString.raw_size() == 23);
 
 			}
 
